@@ -1,4 +1,8 @@
-backbone-mixin
-==============
+# Documention in processs
 
-Mixin for Backbone.View with extend basic functionality
+#run tests
+```bash
+npm install
+bower install
+karma start test.conf.js --single-run
+```
