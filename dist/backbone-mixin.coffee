@@ -43,6 +43,7 @@ MixinBackbone = do ->
         @setNeedRerenderView this
 
       show:(view, options = {})->
+        return unless view?
         @close @_currentView
         view = @getViewDI view, options
         @_currentView = view
@@ -50,11 +51,16 @@ MixinBackbone = do ->
         unless view._$_oneShow?
           view._$_oneShow = true
           view.render?()
+        view.onBeforeShow?()
         @showViewAnimation view
+        view.onShow?()
         view
 
       close:(view)->
+        return unless view?
+        view.onBeforeClose?()
         @closeViewAnimation(view)
+        view.onClose?()
 
       showAnimation:->
         @showViewAnimation this

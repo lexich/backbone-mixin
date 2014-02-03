@@ -10,7 +10,6 @@ MixinBackbone = (function() {
         BaseClass.prototype.setElement.apply(this, arguments);
         this.__$_$removeFlag = false;
         this.reloadTemplate();
-        this.unbindUIElements();
         this.bindUIElements();
         this.bindRegions();
         return this.bindUIEpoxy();
@@ -63,6 +62,9 @@ MixinBackbone = (function() {
         if (options == null) {
           options = {};
         }
+        if (view == null) {
+          return;
+        }
         this.close(this._currentView);
         view = this.getViewDI(view, options);
         this._currentView = view;
@@ -73,11 +75,24 @@ MixinBackbone = (function() {
             view.render();
           }
         }
+        if (typeof view.onBeforeShow === "function") {
+          view.onBeforeShow();
+        }
         this.showViewAnimation(view);
+        if (typeof view.onShow === "function") {
+          view.onShow();
+        }
         return view;
       },
       close: function(view) {
-        return this.closeViewAnimation(view);
+        if (view == null) {
+          return;
+        }
+        if (typeof view.onBeforeClose === "function") {
+          view.onBeforeClose();
+        }
+        this.closeViewAnimation(view);
+        return typeof view.onClose === "function" ? view.onClose() : void 0;
       },
       showAnimation: function() {
         return this.showViewAnimation(this);
@@ -119,7 +134,7 @@ MixinBackbone = (function() {
           key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
         } else {
           TypeView = ViewClass.type;
-          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.™uniqueId("_$_di"));
+          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
         if (this._diViews[key] == null) {
@@ -181,6 +196,7 @@ MixinBackbone = (function() {
         if (this.ui == null) {
           return;
         }
+        this.unbindUIElements();
         this.__bindUIElements = _.extend({}, this.ui);
         this.ui = {};
         return _.each(this.__bindUIElements, (function(_this) {
@@ -200,6 +216,7 @@ MixinBackbone = (function() {
         if (!this.bindings) {
           return;
         }
+        this.unbindUIEpoxy();
         this.__bindings = this.bindings;
         rx = /@ui\.([^ ]+)/;
         return this.bindings = _.reduce(this.__bindings, ((function(_this) {
@@ -215,6 +232,12 @@ MixinBackbone = (function() {
             return memo;
           };
         })(this)), {});
+      },
+      unbindUIEpoxy: function() {
+        if (this.__bindings == null) {
+          return;
+        }
+        return this.bindings = _.extend({}, this.__bindings);
       }
     });
   };

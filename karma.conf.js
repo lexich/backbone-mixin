@@ -18,6 +18,7 @@ module.exports = function(config) {
       'bower_components/lodash/dist/lodash.min.js',
       'bower_components/backbone/backbone-min.js',
       'dist/backbone-mixin.coffee',
+      //'build/backbone-mixin.js',
       'test/*-spec.coffee'
     ],
 
