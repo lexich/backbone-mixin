@@ -6,16 +6,14 @@ MixinBackbone = (function() {
     return BaseClass.extend({
       _diViews: {},
       _currentView: null,
-      _ensureElement: function() {
-        var _ref;
-        if ((_ref = BaseClass.prototype._ensureElement) != null) {
-          _ref.apply(this, arguments);
-        }
+      setElement: function() {
+        BaseClass.prototype.setElement.apply(this, arguments);
         this.__$_$removeFlag = false;
         this.reloadTemplate();
+        this.unbindUIElements();
         this.bindUIElements();
-        this.bindUIEpoxy();
-        return this.bindRegions();
+        this.bindRegions();
+        return this.bindUIEpoxy();
       },
       remove: function() {
         if (this.__$_$removeFlag === true) {
@@ -25,6 +23,7 @@ MixinBackbone = (function() {
         }
         BaseClass.prototype.remove.apply(this, arguments);
         this.unbindRegions();
+        this.unbindUIElements();
         _.each(this._diViews, function(view) {
           return view.remove();
         });
@@ -120,7 +119,7 @@ MixinBackbone = (function() {
           key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
         } else {
           TypeView = ViewClass.type;
-          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
+          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.™uniqueId("_$_di"));
           key = ViewClass.key;
         }
         if (this._diViews[key] == null) {
@@ -141,6 +140,7 @@ MixinBackbone = (function() {
         }
         if (this.templateData != null) {
           data = _.result(this, "templateData");
+          (this.templateFunc != null) || (this.templateFunc = _.template);
         }
         if (this.templateFunc != null) {
           return this.$el.html(this.templateFunc(template, data));
@@ -165,9 +165,15 @@ MixinBackbone = (function() {
         }
         return _.each(this.regions, (function(_this) {
           return function(v, k) {
-            return _this[k] = new Region({
-              el: _this.$el.find(v)
-            });
+            var el;
+            el = _this.$el.find(v);
+            if (_this[k] != null) {
+              return _this[k].setElement(el);
+            } else {
+              return _this[k] = new Region({
+                el: el
+              });
+            }
           };
         })(this));
       },
@@ -182,6 +188,12 @@ MixinBackbone = (function() {
             return _this.ui[k] = _this.$el.find(v);
           };
         })(this));
+      },
+      unbindUIElements: function() {
+        if (this.__bindUIElements == null) {
+          return;
+        }
+        return this.ui = _.extend({}, this.__bindUIElements);
       },
       bindUIEpoxy: function() {
         var rx;

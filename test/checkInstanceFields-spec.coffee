@@ -90,8 +90,7 @@ describe "Check MixinBackbone template engine",->
   it "check templateData & templateFunc & undercore template engine",->
     TestView = MixinBackbone(Backbone.View).extend
       template:"#Test"
-      templateData:{name:"world"}
-      templateFunc:(tmpl, data)-> _.template(tmpl,data)
+      templateData:{name:"world"}      
     view = new TestView
     expect(view.$el.html()).toEqual "<h1>Hello world</h1>"
     view.remove()
@@ -194,3 +193,40 @@ describe "Check show functionality",->
     @view.show @subview    
     expect(@subview.render_counter).toEqual 2
 
+describe "check functionality when setElement call",->
+  beforeEach ->
+    TestView = MixinBackbone(Backbone.View).extend      
+      ui:
+        test:".test_template"
+      events:
+        "click @ui.test":"on_click"
+      regions:
+        test:".test_template"
+      templateFunc:-> "<div class='test_template'><div>"
+      initialize:->
+        @click_counter = 0
+      on_click:->
+        @click_counter += 1
+
+    @view = new TestView        
+
+  afterEach ->
+    @view.remove()
+
+  it "check ui",->
+    @view.ui.test.trigger "click"
+    expect(@view.click_counter).toEqual(1)
+    @view.setElement $("<div>")
+    @view.ui.test.trigger "click"
+    expect(@view.click_counter).toEqual(2)
+
+  it "check regions binding",->
+    $old = @view.test.$el
+    @view.setElement $("<div>")
+    expect($old).not.toEqual @view.test.$el
+
+  it "check template reload",->
+    templateWithRegion = '<div class="test_template"><div></div></div>'
+    expect(@view.$el.html()).toEqual templateWithRegion
+    @view.setElement $("<div>")
+    expect(@view.$el.html()).toEqual templateWithRegion

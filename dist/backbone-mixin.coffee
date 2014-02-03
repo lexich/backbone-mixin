@@ -4,19 +4,20 @@ MixinBackbone = do ->
       _diViews:{}
 
       _currentView:null
-
-      _ensureElement:->
-        BaseClass::_ensureElement?.apply this, arguments
+      
+      setElement:->
+        BaseClass::setElement.apply this, arguments
         @__$_$removeFlag = false
-        @reloadTemplate()
+        @reloadTemplate()        
         @bindUIElements()
+        @bindRegions()        
         @bindUIEpoxy()
-        @bindRegions()
 
       remove:->
         if @__$_$removeFlag is true then return this else @__$_$removeFlag = true
         BaseClass::remove.apply this, arguments
         @unbindRegions()
+        @unbindUIElements()
         _.each @_diViews,(view)->
           view.remove()
         @_diViews = {}
@@ -102,6 +103,7 @@ MixinBackbone = do ->
 
         if @templateData?
           data = _.result(this,"templateData")
+          @templateFunc? or @templateFunc = _.template
 
         if @templateFunc?
           @$el.html @templateFunc(template, data)
@@ -117,17 +119,25 @@ MixinBackbone = do ->
       bindRegions:->
         return unless @regions
         _.each @regions,(v,k)=>
-          this[k] = new Region el: @$el.find(v)
+          el = @$el.find(v)
+          if this[k]? then this[k].setElement el
+          else this[k] = new Region {el}
 
       bindUIElements:->
         return unless @ui?
+        @unbindUIElements()
         @__bindUIElements = _.extend {}, @ui
         @ui = {}
         _.each @__bindUIElements,(v,k,ui)=>
-          @ui[k] = @$el.find v      
+          @ui[k] = @$el.find v   
+
+      unbindUIElements:->
+        return unless @__bindUIElements?
+        @ui = _.extend {}, @__bindUIElements
 
       bindUIEpoxy:->
         return unless @bindings
+        @unbindUIEpoxy()
         @__bindings = @bindings
         rx = /@ui\.([^ ]+)/
         @bindings = _.reduce @__bindings, ((memo, v,k)=>
@@ -139,6 +149,10 @@ MixinBackbone = do ->
             memo[k] = v
           memo
         ),{}
+
+      unbindUIEpoxy:->
+        return unless @__bindings?
+        @bindings = _.extend {}, @__bindings
 
   Region = MixinBackbone(Backbone.View).extend {}
 

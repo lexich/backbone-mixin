@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "karma start test.conf.js --single-run"
+    "test": "karma start karma.conf.js --single-run"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "karma-script-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.3",

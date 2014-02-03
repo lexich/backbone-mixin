@@ -35,12 +35,15 @@ module.exports = function(grunt) {
       }
     },
     karma: {
-      dist: {
+      options:{
         configFile: 'karma.conf.js',
-        runnerPort: 9999,
-        singleRun: true,
-        browsers: ['PhantomJS']
-      }
+        runnerPort: 9999,        
+        browsers: ['PhantomJS'],
+      },
+      dist: {
+        singleRun: true
+      },
+      watch:{}
     }
   });  
   grunt.registerTask('compile', [
