@@ -25,5 +25,5 @@
     "Epoxy",
     "mixin"
   ],
-  "private": true
+  "private": false
 }
