@@ -1,6 +1,6 @@
 {
   "name": "backbone-mixin",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "authors": [
     "lexich121@gmail.com"
   ],
@@ -16,5 +16,14 @@
     "lodash": "~2.4.1",
     "backbone": "~1.1.0",
     "jquery": "~1.10.2"
-  }
+  },
+  "homepage": "https://github.com/lexich/backbone-mixin",
+  "description": "Additional functionality for Backbone.View (of Backbone.Epoxy.View)",
+  "main": "build/backbone-mixin.js",
+  "keywords": [
+    "Backbone",
+    "Epoxy",
+    "mixin"
+  ],
+  "private": true
 }
