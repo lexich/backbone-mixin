@@ -7,11 +7,42 @@ describe "Check MixinBackbone bindRegions", ->
     expect(!!view.regions).toBeTruthy()
     view.remove()
     expect(!view.test).toBeTruthy()
+  it "check custom regions with selector",->
+    RegionView = do(SuperClass = MixinBackbone(Backbone.View) )->
+      SuperClass.extend
+        custom_region:true
+        remove:->
+          @remove_custom_view = true
+          SuperClass::remove.apply this, arguments
+
+    TestView = MixinBackbone(Backbone.View).extend
+      regions:
+        test: el:".test", view:RegionView
+
+    view = new TestView
+    expect(!!view.regions).toBeTruthy()
+    expect(!!view.test).toBeTruthy()
+    expect(!!view.test.custom_region).toBeTruthy()
+    test = view.test
+    view.remove()
+    expect(!view.test).toBeTruthy()
+    expect(!!test.remove_custom_view).toBeTruthy()
+
+
+  it "check custom regions with dom element",->
+    RegionView = MixinBackbone(Backbone.View).extend {}
+    $el = $("<div class='test'/>")
+    TestView = MixinBackbone(Backbone.View).extend
+      regions:
+        test: el:$el, view:RegionView
+    view = new TestView()
+    expect(view.test.$el).toEqual($el)
+    view.remove()
 
 describe "Check MixinBackbone bindUIElements",->
   beforeEach ->
     View = Backbone.View.extend
-      delegateEvents:(event)->        
+      delegateEvents:(event)->
         @_checkEvents = event
         Backbone.View::delegateEvents.apply this, arguments
 
@@ -29,7 +60,7 @@ describe "Check MixinBackbone bindUIElements",->
   afterEach ->
     @view.remove()
 
-  it "check ui",->        
+  it "check ui",->
     expect(!!@view.ui).toBeTruthy()
     expect(!!@view.__bindUIElements).toBeTruthy()
     expect(_.size(_.keys(@view.ui))).toEqual(2)
@@ -40,8 +71,8 @@ describe "Check MixinBackbone bindUIElements",->
     expect(_.size(@view.ui)).toEqual(2)
     expect(_.size(@view.events)).toEqual(4)
     expect(_.size(@view._checkEvents)).toEqual(4)
-    
-  it "check content click @ui.hello",->    
+
+  it "check content click @ui.hello",->
     expect(_.keys(@view._checkEvents)).toContain "click .hello_class"
 
   it "check content click @ui.bye",->
@@ -75,8 +106,8 @@ describe "Check MixinBackbone bindUIEpoxy",->
 
 describe "Check MixinBackbone template engine",->
   beforeEach ->
-    $("body").html "<script id='Test' type='text/html'><h1>Hello <%= name %></h1></script>"    
-  
+    $("body").html "<script id='Test' type='text/html'><h1>Hello <%= name %></h1></script>"
+
   afterEach ->
     $("#Test").remove()
 
@@ -90,7 +121,7 @@ describe "Check MixinBackbone template engine",->
   it "check templateData & templateFunc & undercore template engine",->
     TestView = MixinBackbone(Backbone.View).extend
       template:"#Test"
-      templateData:{name:"world"}      
+      templateData:{name:"world"}
     view = new TestView
     expect(view.$el.html()).toEqual "<h1>Hello world</h1>"
     view.remove()
@@ -107,8 +138,8 @@ describe "Check MixinBackbone DI",->
   it "check DI keys works",->
     view1 = @view.getViewDI @TestViewDI
     diKey = "#{@TestViewDI._$_di}"
-    view2 = @view.getViewDI @TestViewDI    
-    expect(diKey).toEqual "#{@TestViewDI._$_di}" 
+    view2 = @view.getViewDI @TestViewDI
+    expect(diKey).toEqual "#{@TestViewDI._$_di}"
 
   it "check DI clean memory",->
     view = new @TestView
@@ -118,10 +149,10 @@ describe "Check MixinBackbone DI",->
     view.remove()
     expect(diView.remove).toHaveBeenCalled()
     expect(_.keys(view._diViews).length).toEqual 0
-  
+
   it "checks DI preserve class",->
     view1 = @view.getViewDI @TestViewDI
-    view2 = @view.getViewDI @TestViewDI    
+    view2 = @view.getViewDI @TestViewDI
     expect(view1).toEqual view2
 
   it "check DI precerve instace",->
@@ -146,7 +177,7 @@ describe "Check show functionality",->
 
     }
     @view = new TestView
-    @subview = new TestView    
+    @subview = new TestView
 
   afterEach ->
     @view.remove()
@@ -167,10 +198,10 @@ describe "Check show functionality",->
   it "check not double exec rerender from subview",->
     spyOn @subview, "showViewAnimation"
     spyOn @subview, "closeViewAnimation"
-    @view.show @subview 
+    @view.show @subview
     expect(@subview.showViewAnimation).toHaveBeenCalled()
     @view.show @subview
-    expect(@subview.closeViewAnimation).toHaveBeenCalled()    
+    expect(@subview.closeViewAnimation).toHaveBeenCalled()
     expect(@subview.render_counter).toEqual 1
 
   it "check showAnimation",->
@@ -182,20 +213,20 @@ describe "Check show functionality",->
     spyOn @view, "closeViewAnimation"
     @view.showAnimation()
     expect(@view.closeViewAnimation).toBeTruthy()
-  it "check setNeedRerender functionality",->    
+  it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
     @view.setNeedRerender()
     expect(@view.setNeedRerenderView).toHaveBeenCalled()
 
   it "check setNeedRerender",->
-    @view.show @subview 
+    @view.show @subview
     @subview.setNeedRerender()
-    @view.show @subview    
+    @view.show @subview
     expect(@subview.render_counter).toEqual 2
 
 describe "check functionality when setElement call",->
   beforeEach ->
-    TestView = MixinBackbone(Backbone.View).extend      
+    TestView = MixinBackbone(Backbone.View).extend
       ui:
         test:".test_template"
       events:
@@ -208,7 +239,7 @@ describe "check functionality when setElement call",->
       on_click:->
         @click_counter += 1
 
-    @view = new TestView        
+    @view = new TestView
 
   afterEach ->
     @view.remove()

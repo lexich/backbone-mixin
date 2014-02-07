@@ -180,12 +180,18 @@ MixinBackbone = (function() {
         }
         return _.each(this.regions, (function(_this) {
           return function(v, k) {
-            var el;
-            el = _this.$el.find(v);
+            var View, el;
+            if (_.isObject(v)) {
+              el = _.isString(v.el) ? _this.$el.find(v.el) : el = v.el;
+              View = v.view;
+            } else {
+              el = _this.$el.find(v);
+              View = Region;
+            }
             if (_this[k] != null) {
               return _this[k].setElement(el);
             } else {
-              return _this[k] = new Region({
+              return _this[k] = new View({
                 el: el
               });
             }

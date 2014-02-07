@@ -4,13 +4,13 @@ MixinBackbone = do ->
       _diViews:{}
 
       _currentView:null
-      
+
       setElement:->
         BaseClass::setElement.apply this, arguments
         @__$_$removeFlag = false
-        @reloadTemplate()        
+        @reloadTemplate()
         @bindUIElements()
-        @bindRegions()        
+        @bindRegions()
         @bindUIEpoxy()
 
       remove:->
@@ -22,12 +22,12 @@ MixinBackbone = do ->
           view.remove()
         @_diViews = {}
 
-      delegateEvents:(events)->        
+      delegateEvents:(events)->
         events or (events = _.result(this,'events'))
-        if @__bindUIElements? and events?          
+        if @__bindUIElements? and events?
           events = _.reduce events, ((memo, v,k)=>
             result = k.match(/@ui\.[^ ,]+/g)
-            if result? then for part in result              
+            if result? then for part in result
               if /@ui\.([^ ,]+)/.exec(part)?
                 selector = @__bindUIElements[RegExp.$1]
                 k = k.replace part, selector
@@ -125,9 +125,18 @@ MixinBackbone = do ->
       bindRegions:->
         return unless @regions
         _.each @regions,(v,k)=>
-          el = @$el.find(v)
+          if _.isObject(v)
+            el = if _.isString(v.el)
+              @$el.find(v.el)
+            else
+              el = v.el
+            View = v.view
+          else
+            el = @$el.find(v)
+            View = Region
+
           if this[k]? then this[k].setElement el
-          else this[k] = new Region {el}
+          else this[k] = new View {el}
 
       bindUIElements:->
         return unless @ui?
@@ -135,7 +144,7 @@ MixinBackbone = do ->
         @__bindUIElements = _.extend {}, @ui
         @ui = {}
         _.each @__bindUIElements,(v,k,ui)=>
-          @ui[k] = @$el.find v   
+          @ui[k] = @$el.find v
 
       unbindUIElements:->
         return unless @__bindUIElements?
@@ -165,7 +174,7 @@ MixinBackbone = do ->
   MixinBackbone
 
 
-if (typeof define is 'function') and (typeof define.amd is 'object') and define.amd  
+if (typeof define is 'function') and (typeof define.amd is 'object') and define.amd
   define [], -> MixinBackbone
 else
   window.MixinBackbone = MixinBackbone
