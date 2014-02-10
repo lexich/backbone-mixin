@@ -32,16 +32,53 @@ template:"#Template"
 <p>Template content</p>
 </script>
 ```
-#### templateData
-Type `Object` or `Function`
 
 #### templateFunc
 Type `Function`
+Function for process `template`. For expample you can use underscore template engine of handlebars etc.
+```js
+templateFunc:function(template,data){
+  return _.template(template,data);
+}
+```
 
+#### templateData
+Type `Object` or `Function`
+Data for template processing. If templateFunc isn't define and templateData define, then templateFunc use underscore template engine.
 
 #### regions
 Type `Object`
+Sugar syntax for bingins subview. `regions` can be used for gluing current view with multiple other views
+```js
+regions:{
+  "hello":".hello_selector"
+},
+render:function(){
+  //this.hello is BackboneMixin(Backbone.View) instance
+  this.hello.show(CustomBackboneView); 
+  //now instance of CustomBackboneVIew is subview of this.hello view
+}
+```
+Also regions can use for point to point view bindings
 
+```js
+regions:{
+  hello:{
+    el:".hello_selector",
+    view: (HelloView = MixinBackbone(Backbone.View).extend({
+    }))
+  },
+  render:function(){
+    this.hello.$el === this.$el.find(".hello_selector");
+  }
+}
+```
+
+#### show(view,options)
+Type `Function`
+
+#### close(view)
+Type `Function`
 
 ### setNeedRerenderView(view)
 Type `Function`
@@ -53,12 +90,6 @@ Set flag to re-render (call render function after re-open view)
 #### setNeedRerender 
 Type `Function`
 Alias setNeedRerenderView(this)
-
-#### show(view,options)
-Type `Function`
-
-#### close(view)
-Type `Function`
 
 #### showViewAnimation(view)
 Type `Function`
