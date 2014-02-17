@@ -117,6 +117,13 @@ Depedencies Injection functionality
     - type: `Backbone.View` - View prototype
     - key: `String` - key for different instace
 
+#### onShow
+Type `Function`
+callback caller,  execute when view base view `show` this view
+
+#### onHide
+Type `Function`
+callback caller, execute when view base view `close` this view
 
 #Run tests
 ```bash
