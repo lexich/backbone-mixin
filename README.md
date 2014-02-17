@@ -1,8 +1,13 @@
 [![Build Status](https://travis-ci.org/lexich/backbone-mixin.png?branch=master)](https://travis-ci.org/lexich/backbone-mixin)
-### Description
+# Description
 Mixin for extend [Backbone.View](http://backbonejs.org/#View) or [Backbone.Epoxy.View](http://epoxyjs.org/documentation.html#view)  
 Inspired by [Chalin](chaplinjs.org) and [Marionette](http://marionettejs.com/)  
 It's not a framework, it's little mixin-helper for great arhitecture.
+
+# Instalation
+```
+bower install backbone-mixin --save
+```
 
 #### ui  
 Type `Object`  
