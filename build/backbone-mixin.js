@@ -78,6 +78,11 @@ MixinBackbone = (function() {
         if (typeof view.onBeforeShow === "function") {
           view.onBeforeShow();
         }
+        if (view.regions != null) {
+          _.each(view.regions, function(v, k) {
+            return view[k].show(view[k]);
+          });
+        }
         this.showViewAnimation(view);
         if (typeof view.onShow === "function") {
           view.onShow();
@@ -87,6 +92,17 @@ MixinBackbone = (function() {
       close: function(view) {
         if (view == null) {
           return;
+        }
+        if (this._currentView !== view) {
+          this.close(this._currentView);
+        }
+        this._currentView = null;
+        if (view.regions != null) {
+          _.each(view.regions, function(v, k) {
+            var reg;
+            reg = view[k];
+            return reg.close(reg);
+          });
         }
         if (typeof view.onBeforeClose === "function") {
           view.onBeforeClose();
