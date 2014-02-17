@@ -1,6 +1,6 @@
 {
   "name": "backbone-mixin",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "authors": [
     "lexich121@gmail.com"
   ],
@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "lodash": "~2.4.1",
-    "backbone": "~1.1.0",
+    "backbone": "~1.1.1",
     "jquery": "~1.10.2"
   },
   "homepage": "https://github.com/lexich/backbone-mixin",
