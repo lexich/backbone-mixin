@@ -52,12 +52,23 @@ MixinBackbone = do ->
           view._$_oneShow = true
           view.render?()
         view.onBeforeShow?()
+        if view.regions?
+          _.each view.regions, (v,k)->
+            view[k].show view[k]
         @showViewAnimation view
         view.onShow?()
         view
 
       close:(view)->
         return unless view?
+        @close @_currentView if @_currentView isnt view
+        @_currentView = null
+        #close regions
+        if view.regions?
+          _.each view.regions, (v,k)->
+            reg = view[k]
+            reg.close reg
+
         view.onBeforeClose?()
         @closeViewAnimation(view)
         view.onClose?()

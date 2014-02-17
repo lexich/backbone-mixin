@@ -213,6 +213,41 @@ describe "Check show functionality",->
     spyOn @view, "closeViewAnimation"
     @view.showAnimation()
     expect(@view.closeViewAnimation).toBeTruthy()
+
+  it "check close parent and close child",->
+    @view.show @subview
+    spyOn @subview, "closeViewAnimation"
+    @view.close @view
+    expect(@subview.closeViewAnimation).toHaveBeenCalled()
+
+  it "check close parent and close child region",->    
+    onCloseCounter = 0
+    onShowCounter = 0
+    SuperClass = MixinBackbone(Backbone.View)
+    RegionView = SuperClass.extend 
+      onClose:->
+        onCloseCounter += 1
+      onShow:->
+        onShowCounter += 1
+    SubView = SuperClass.extend 
+      regions: test: el:".test", view: RegionView
+
+    subview = new SubView
+    @view.show subview
+
+    spyOn subview, "closeViewAnimation"
+    spyOn subview.test, "closeViewAnimation"
+    expect(onShowCounter).toEqual 1
+    @view.close @view
+    expect(subview.closeViewAnimation).toHaveBeenCalled()
+    expect(subview.test.closeViewAnimation).toHaveBeenCalled()
+    expect(onCloseCounter).toEqual 1
+
+    @view.show subview
+    expect(onShowCounter).toEqual 2
+    expect(onCloseCounter).toEqual 1
+    subview.remove()
+
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
     @view.setNeedRerender()
