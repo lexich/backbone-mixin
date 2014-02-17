@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/lexich/backbone-mixin.png?branch=master)](https://travis-ci.org/lexich/backbone-mixin)
-# Documention in processs
 
 #### ui  
 Type `Object`  
@@ -23,7 +22,7 @@ Syntax sugar, define map of children dom elements.
 
 #### template
 Type `String`
-Direct load html template from DOM to current element
+Direct loading html template from DOM to current element (this.el)
 ```js
 template:"#Template"
 ```
@@ -73,19 +72,19 @@ regions:{
   }
 }
 ```
+when view render with "show" mechanizm then all regions call render
 
 #### show(view,options)
 Type `Function`
+Show view in current view. Very usefull for regions. This method append `view.el` to `this.el` and call helper method `this.showViewAnimation`
 
 #### close(view)
 Type `Function`
+Close view which was opened in current view. This method not call `this.remove` by default, but call helper method `this.closeViewAnimation`
 
 ### setNeedRerenderView(view)
 Type `Function`
-
-#### view
-Type: `Backbone.View`
-Set flag to re-render (call render function after re-open view)
+`show` mechanizm call `view.render` function only while first calling. `setNeedRerenderView` forse call `view.render` function once again
 
 #### setNeedRerender 
 Type `Function`
@@ -93,6 +92,7 @@ Alias setNeedRerenderView(this)
 
 #### showViewAnimation(view)
 Type `Function`
+Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
 
 #### showAnimation
 Type `Function`
@@ -100,6 +100,7 @@ Alias showViewAnimation(this)
 
 #### closeViewAnimation(view)
 Type `Function`
+Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
 
 #### closeAnimation
 Type `Function`
@@ -107,13 +108,20 @@ Alias closeViewAnimation(this)
 
 #### getViewDI(ViewParams, options)
 Type `Function`
-
+Depedencies Injection functionality
+`options` - options for `new View(options)`  operations
+`ViewParams`
+  - type `Backbone.View` - if you use this View only once in ypu application
+  - type `instance Backbone.View` - if you save instance ny ViewParams.cid
+  - type `object` - usefull for multiple using Views
+    - type: `Backbone.View` - View prototype
+    - key: `String` - key for different instace
 
 
 #Run tests
 ```bash
 npm install
 bower install
-grunt
+grunt karma:dist
 ```
 
