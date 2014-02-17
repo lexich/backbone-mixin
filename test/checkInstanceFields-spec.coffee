@@ -248,6 +248,21 @@ describe "Check show functionality",->
     expect(onCloseCounter).toEqual 1
     subview.remove()
 
+  it "render regions after render base view",->
+    SuperClass = MixinBackbone(Backbone.View)
+
+    RegionView = SuperClass.extend {}
+      
+    SubView = SuperClass.extend 
+      regions: test: el:".test", view: RegionView
+
+    subview = new SubView
+    spyOn subview, "render"
+    spyOn subview.test, "render"
+    @view.show subview
+    expect(subview.render).toHaveBeenCalled()
+    expect(subview.test.render).toHaveBeenCalled()
+
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
     @view.setNeedRerender()
