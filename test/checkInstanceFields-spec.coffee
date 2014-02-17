@@ -261,7 +261,7 @@ describe "Check show functionality",->
     spyOn subview.test, "render"
     @view.show subview
     expect(subview.render).toHaveBeenCalled()
-    expect(subview.test.render).toHaveBeenCalled()
+    expect(subview.test.render).toHaveBeenCalled()    
 
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
