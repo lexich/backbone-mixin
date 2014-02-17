@@ -1,6 +1,6 @@
 var MixinBackbone;
 
-MixinBackbone = (function() {
+MixinBackbone = function() {
   var Region;
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
@@ -269,12 +269,12 @@ MixinBackbone = (function() {
   };
   Region = MixinBackbone(Backbone.View).extend({});
   return MixinBackbone;
-})();
+};
 
 if ((typeof define === 'function') && (typeof define.amd === 'object') && define.amd) {
   define([], function() {
-    return MixinBackbone;
+    return MixinBackbone();
   });
 } else {
-  window.MixinBackbone = MixinBackbone;
+  window.MixinBackbone = MixinBackbone();
 }

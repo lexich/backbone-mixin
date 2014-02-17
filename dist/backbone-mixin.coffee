@@ -1,4 +1,4 @@
-MixinBackbone = do ->
+MixinBackbone = ->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       _diViews:{}
@@ -189,6 +189,6 @@ MixinBackbone = do ->
 
 
 if (typeof define is 'function') and (typeof define.amd is 'object') and define.amd
-  define [], -> MixinBackbone
+  define [], -> MixinBackbone()
 else
-  window.MixinBackbone = MixinBackbone
+  window.MixinBackbone = MixinBackbone()
