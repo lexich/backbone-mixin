@@ -64,7 +64,8 @@ MixinBackbone = (Backbone)->
 
       close:(view)->
         return unless view?
-        @close @_currentView if @_currentView isnt view
+        if @_currentView? and @_currentView isnt view
+          @close @_currentView 
         @_currentView = null
         #close regions
         if view.regions?
