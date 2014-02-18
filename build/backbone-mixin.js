@@ -58,11 +58,12 @@ MixinBackbone = function(Backbone) {
       setNeedRerender: function() {
         return this.setNeedRerenderView(this);
       },
-      show: function(view, options) {
+      show: function(_view, options) {
+        var view;
         if (options == null) {
           options = {};
         }
-        if (view == null) {
+        if (_view == null) {
           return;
         }
         if (this !== this._currentView) {
@@ -70,7 +71,7 @@ MixinBackbone = function(Backbone) {
         } else {
           this._currentView = null;
         }
-        view = this.getViewDI(view, options);
+        view = this.getViewDI(_view, options);
         this._currentView = view;
         this.$el.append(view.$el);
         if (view._$_oneShow == null) {
@@ -93,26 +94,26 @@ MixinBackbone = function(Backbone) {
         }
         return view;
       },
-      close: function(view) {
-        if (view == null) {
+      close: function(_view) {
+        if (_view == null) {
           return;
         }
-        if ((this._currentView != null) && this._currentView !== view) {
+        if ((this._currentView != null) && this._currentView !== _view) {
           this.close(this._currentView);
         }
         this._currentView = null;
-        if (view.regions != null) {
-          _.each(view.regions, function(v, k) {
+        if (_view.regions != null) {
+          _.each(_view.regions, function(v, k) {
             var reg;
-            reg = view[k];
+            reg = _view[k];
             return reg.close(reg);
           });
         }
-        if (typeof view.onBeforeClose === "function") {
-          view.onBeforeClose();
+        if (typeof _view.onBeforeClose === "function") {
+          _view.onBeforeClose();
         }
-        this.closeViewAnimation(view);
-        return typeof view.onClose === "function" ? view.onClose() : void 0;
+        this.closeViewAnimation(_view);
+        return typeof _view.onClose === "function" ? _view.onClose() : void 0;
       },
       showAnimation: function() {
         return this.showViewAnimation(this);

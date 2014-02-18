@@ -42,13 +42,13 @@ MixinBackbone = (Backbone)->
       setNeedRerender:->
         @setNeedRerenderView this
 
-      show:(view, options = {})->
-        return unless view?
+      show:(_view, options = {})->
+        return unless _view?
         if this isnt @_currentView
           @close @_currentView
         else
           @_currentView = null
-        view = @getViewDI view, options
+        view = @getViewDI _view, options
         @_currentView = view
         @$el.append view.$el
         unless view._$_oneShow?
@@ -62,20 +62,20 @@ MixinBackbone = (Backbone)->
         view.onShow?()
         view
 
-      close:(view)->
-        return unless view?
-        if @_currentView? and @_currentView isnt view
+      close:(_view)->
+        return unless _view?
+        if @_currentView? and @_currentView isnt _view
           @close @_currentView 
         @_currentView = null
         #close regions
-        if view.regions?
-          _.each view.regions, (v,k)->
-            reg = view[k]
+        if _view.regions?
+          _.each _view.regions, (v,k)->
+            reg = _view[k]
             reg.close reg
 
-        view.onBeforeClose?()
-        @closeViewAnimation(view)
-        view.onClose?()
+        _view.onBeforeClose?()
+        @closeViewAnimation _view
+        _view.onClose?()
 
       showAnimation:->
         @showViewAnimation this
