@@ -72,7 +72,9 @@ MixinBackbone = function(Backbone) {
           this._currentView = null;
         }
         view = this.getViewDI(_view, options);
-        this._currentView = view;
+        if (this !== view) {
+          this._currentView = view;
+        }
         this.$el.append(view.$el);
         if (view._$_oneShow == null) {
           view._$_oneShow = true;

@@ -49,7 +49,8 @@ MixinBackbone = (Backbone)->
         else
           @_currentView = null
         view = @getViewDI _view, options
-        @_currentView = view
+        if this isnt view
+          @_currentView = view
         @$el.append view.$el
         unless view._$_oneShow?
           view._$_oneShow = true
