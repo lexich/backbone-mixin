@@ -2,14 +2,17 @@ var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
-    var currentView, diViews, removeFlag, var_bindings, varbindUIElements;
-    currentView = null;
-    diViews = {};
-    removeFlag = false;
-    varbindUIElements = null;
-    var_bindings = null;
     return BaseClass.extend({
       setElement: function() {
+        if (this._$_p == null) {
+          this._$_p = {
+            currentView: null,
+            diViews: {},
+            removeFlag: false,
+            varbindUIElements: null,
+            var_bindings: null
+          };
+        }
         BaseClass.prototype.setElement.apply(this, arguments);
         this.reloadTemplate();
         this.bindUIElements();
@@ -17,31 +20,32 @@ MixinBackbone = function(Backbone) {
         return this.bindUIEpoxy();
       },
       remove: function() {
-        var k, view;
-        if (removeFlag === true) {
+        var k, view, _ref;
+        if (this._$_p.removeFlag === true) {
           return this;
         } else {
-          removeFlag = true;
+          this._$_p.removeFlag = true;
         }
         BaseClass.prototype.remove.apply(this, arguments);
         this.unbindRegions();
         this.unbindUIElements();
-        for (k in diViews) {
-          view = diViews[k];
+        _ref = this._$_p.diViews;
+        for (k in _ref) {
+          view = _ref[k];
           view.remove();
         }
-        return diViews = {};
+        return this._$_p.diViews = {};
       },
       _diViewsKeys: function() {
-        return _.keys(diViews);
+        return _.keys(this._$_p.diViews);
       },
       _diViewsValues: function() {
-        return _.values(diViews);
+        return _.values(this._$_p.diViews);
       },
       delegateEvents: function(events) {
         var _ref;
         events || (events = _.result(this, 'events'));
-        if ((varbindUIElements != null) && (events != null)) {
+        if ((this._$_p.varbindUIElements != null) && (events != null)) {
           events = _.reduce(events, ((function(_this) {
             return function(memo, v, k) {
               var part, result, selector, _i, _len;
@@ -50,7 +54,7 @@ MixinBackbone = function(Backbone) {
                 for (_i = 0, _len = result.length; _i < _len; _i++) {
                   part = result[_i];
                   if (/@ui\.([^ ,]+)/.exec(part) != null) {
-                    selector = varbindUIElements[RegExp.$1];
+                    selector = _this._$_p.varbindUIElements[RegExp.$1];
                     k = k.replace(part, selector);
                   }
                 }
@@ -68,6 +72,9 @@ MixinBackbone = function(Backbone) {
       setNeedRerender: function() {
         return this.setNeedRerenderView(this);
       },
+      _setCurrentView: function(view) {
+        return this._$_p.currentView = view;
+      },
       show: function(_view, options) {
         var view;
         if (options == null) {
@@ -76,13 +83,13 @@ MixinBackbone = function(Backbone) {
         if (_view == null) {
           return;
         }
-        if ((currentView != null) && this !== currentView) {
-          this.close(currentView);
+        if ((this._$_p.currentView != null) && this !== this._$_p.currentView) {
+          this.close(this._$_p.currentView);
         }
-        currentView = null;
+        this._setCurrentView(null);
         view = this.getViewDI(_view, options);
         if (this !== view) {
-          currentView = view;
+          this._setCurrentView(view);
         }
         this.$el.append(view.$el);
         view.showCurrent();
@@ -129,10 +136,10 @@ MixinBackbone = function(Backbone) {
         if (_view == null) {
           return;
         }
-        if ((currentView != null) && currentView !== _view) {
-          this.close(currentView);
+        if ((this._$_p.currentView != null) && this._$_p.currentView !== _view) {
+          this.close(this._$_p.currentView);
         }
-        currentView = null;
+        this._setCurrentView(null);
         _view.closeCurrent();
         return _view;
       },
@@ -170,7 +177,7 @@ MixinBackbone = function(Backbone) {
         if (ViewClass.cid != null) {
           TypeView = ViewClass.constructor;
           key = ViewClass.cid;
-          diViews[key] = ViewClass;
+          this._$_p.diViews[key] = ViewClass;
         } else if (typeof ViewClass === "function") {
           TypeView = ViewClass;
           key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
@@ -179,10 +186,10 @@ MixinBackbone = function(Backbone) {
           TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
-        if (diViews[key] == null) {
-          diViews[key] = new TypeView(options);
+        if (this._$_p.diViews[key] == null) {
+          this._$_p.diViews[key] = new TypeView(options);
         }
-        return diViews[key];
+        return this._$_p.diViews[key];
       },
       reloadTemplate: function() {
         var $el, data, template;
@@ -246,26 +253,27 @@ MixinBackbone = function(Backbone) {
         return _results;
       },
       bindUIElements: function() {
-        var k, v, _results;
+        var k, v, _ref, _results;
         if (this.ui == null) {
           return;
         }
         this.unbindUIElements();
-        varbindUIElements = _.extend({}, this.ui);
+        this._$_p.varbindUIElements = _.extend({}, this.ui);
         this.ui = {};
+        _ref = this._$_p.varbindUIElements;
         _results = [];
-        for (k in varbindUIElements) {
-          v = varbindUIElements[k];
+        for (k in _ref) {
+          v = _ref[k];
           _results.push(this.ui[k] = this.$el.find(v));
         }
         return _results;
       },
       unbindUIElements: function() {
-        if (varbindUIElements == null) {
+        if (this._$_p.varbindUIElements == null) {
           return;
         }
-        this.ui = varbindUIElements;
-        return varbindUIElements = null;
+        this.ui = this._$_p.varbindUIElements;
+        return this._$_p.varbindUIElements = null;
       },
       bindUIEpoxy: function() {
         var rx;
@@ -273,13 +281,13 @@ MixinBackbone = function(Backbone) {
           return;
         }
         this.unbindUIEpoxy();
-        var_bindings = this.bindings;
+        this._$_p.var_bindings = this.bindings;
         rx = /@ui\.([^ ]+)/;
-        return this.bindings = _.reduce(var_bindings, ((function(_this) {
+        return this.bindings = _.reduce(this._$_p.var_bindings, ((function(_this) {
           return function(memo, v, k) {
             var key, selector;
             if (rx.exec(k) != null) {
-              selector = varbindUIElements[RegExp.$1];
+              selector = _this._$_p.varbindUIElements[RegExp.$1];
               key = k.replace(rx, selector);
               memo[key] = v;
             } else {
@@ -290,11 +298,11 @@ MixinBackbone = function(Backbone) {
         })(this)), {});
       },
       unbindUIEpoxy: function() {
-        if (var_bindings == null) {
+        if (this._$_p.var_bindings == null) {
           return;
         }
-        this.bindings = var_bindings;
-        return var_bindings = null;
+        this.bindings = this._$_p.var_bindings;
+        return this._$_p.var_bindings = null;
       }
     });
   };

@@ -1,14 +1,15 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
-    currentView = null
-    diViews = {}
-    removeFlag = false
-    varbindUIElements = null
-    var_bindings = null
-
     BaseClass.extend
 
       setElement:->
+        unless @_$_p?
+          @_$_p =
+            currentView:null
+            diViews:{}
+            removeFlag:false
+            varbindUIElements:null
+            var_bindings:null
         BaseClass::setElement.apply this, arguments
         @reloadTemplate()
         @bindUIElements()
@@ -16,24 +17,24 @@ MixinBackbone = (Backbone)->
         @bindUIEpoxy()
 
       remove:->
-        if removeFlag is true then return this else removeFlag = true
+        if @_$_p.removeFlag is true then return this else @_$_p.removeFlag = true
         BaseClass::remove.apply this, arguments
         @unbindRegions()
         @unbindUIElements()
-        view.remove() for k,view of diViews
-        diViews = {}
+        view.remove() for k,view of @_$_p.diViews
+        @_$_p.diViews = {}
 
-      _diViewsKeys:-> _.keys(diViews)
-      _diViewsValues:-> _.values(diViews)
+      _diViewsKeys:-> _.keys(@_$_p.diViews)
+      _diViewsValues:-> _.values(@_$_p.diViews)
 
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
-        if varbindUIElements? and events?
+        if @_$_p.varbindUIElements? and events?
           events = _.reduce events, ((memo, v,k)=>
             result = k.match(/@ui\.[^ ,]+/g)
             if result? then for part in result
               if /@ui\.([^ ,]+)/.exec(part)?
-                selector = varbindUIElements[RegExp.$1]
+                selector = @_$_p.varbindUIElements[RegExp.$1]
                 k = k.replace part, selector
             memo[k] = v
             memo
@@ -46,13 +47,15 @@ MixinBackbone = (Backbone)->
       setNeedRerender:->
         @setNeedRerenderView this
 
+      _setCurrentView:(view)-> @_$_p.currentView = view
+
       show:(_view, options = {})->
         return unless _view?
-        @close currentView if currentView? and this isnt currentView
-        currentView = null
+        @close @_$_p.currentView if @_$_p.currentView? and this isnt @_$_p.currentView
+        @_setCurrentView null
         view = @getViewDI _view, options
         if this isnt view
-          currentView = view
+          @_setCurrentView view
         @$el.append view.$el
         view.showCurrent()
         view
@@ -84,8 +87,8 @@ MixinBackbone = (Backbone)->
 
       close:(_view)->
         return unless _view?
-        @close currentView  if currentView? and currentView isnt _view
-        currentView = null
+        @close @_$_p.currentView  if @_$_p.currentView? and @_$_p.currentView isnt _view
+        @_setCurrentView null
         _view.closeCurrent()
         _view
 
@@ -113,7 +116,7 @@ MixinBackbone = (Backbone)->
         if ViewClass.cid?
           TypeView = ViewClass.constructor
           key = ViewClass.cid
-          diViews[key] = ViewClass
+          @_$_p.diViews[key] = ViewClass
         else if typeof(ViewClass) is "function"
           TypeView = ViewClass
           key = TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
@@ -121,9 +124,9 @@ MixinBackbone = (Backbone)->
           TypeView = ViewClass.type
           TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
           key =  ViewClass.key
-        unless diViews[key]?
-          diViews[key] = new TypeView options
-        diViews[key]
+        unless @_$_p.diViews[key]?
+          @_$_p.diViews[key] = new TypeView options
+        @_$_p.diViews[key]
 
       reloadTemplate:->
         template = null
@@ -168,24 +171,24 @@ MixinBackbone = (Backbone)->
       bindUIElements:->
         return unless @ui?
         @unbindUIElements()
-        varbindUIElements = _.extend {}, @ui
+        @_$_p.varbindUIElements = _.extend {}, @ui
         @ui = {}
-        for k, v of varbindUIElements
+        for k, v of @_$_p.varbindUIElements
           @ui[k] = @$el.find v
 
       unbindUIElements:->
-        return unless varbindUIElements?
-        @ui = varbindUIElements
-        varbindUIElements = null
+        return unless @_$_p.varbindUIElements?
+        @ui = @_$_p.varbindUIElements
+        @_$_p.varbindUIElements = null
 
       bindUIEpoxy:->
         return unless @bindings
         @unbindUIEpoxy()
-        var_bindings = @bindings
+        @_$_p.var_bindings = @bindings
         rx = /@ui\.([^ ]+)/
-        @bindings = _.reduce var_bindings, ((memo, v,k)=>
+        @bindings = _.reduce @_$_p.var_bindings, ((memo, v,k)=>
           if rx.exec(k)?
-            selector = varbindUIElements[RegExp.$1]
+            selector = @_$_p.varbindUIElements[RegExp.$1]
             key = k.replace rx, selector
             memo[key] = v
           else
@@ -194,9 +197,9 @@ MixinBackbone = (Backbone)->
         ),{}
 
       unbindUIEpoxy:->
-        return unless var_bindings?
-        @bindings = var_bindings
-        var_bindings = null
+        return unless @_$_p.var_bindings?
+        @bindings = @_$_p.var_bindings
+        @_$_p.var_bindings = null
 
   MixinBackbone
 

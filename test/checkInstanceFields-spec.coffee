@@ -61,15 +61,15 @@ describe "Check MixinBackbone bindUIElements",->
     @view.remove()
 
   it "check ui",->
-    expect(!!@view.ui).toBeTruthy()    
-    expect(_.size(_.keys(@view.ui))).toEqual(2)
+    expect(!!@view.ui).toBeTruthy()
+    expect(2).toEqual _.size(_.keys(@view.ui))
     expect(!!@view.ui.hello).toBeTruthy()
     expect(!!@view.ui.bye).toBeTruthy()
 
   it "check length",->
-    expect(_.size(@view.ui)).toEqual(2)
-    expect(_.size(@view.events)).toEqual(4)
-    expect(_.size(@view._checkEvents)).toEqual(4)
+    expect(2).toEqual _.size(@view.ui)
+    expect(4).toEqual _.size(@view.events)
+    expect(4).toEqual _.size(@view._checkEvents)
 
   it "check content click @ui.hello",->
     expect(_.keys(@view._checkEvents)).toContain "click .hello_class"
@@ -179,12 +179,12 @@ describe "Check show functionality:",->
     @subview = new TestView
 
   afterEach ->
-    @view.remove()  
+    @view.remove()
 
   it "check exec close after show",->
     spyOn @subview, "showAnimation"
     spyOn @subview, "render"
-    @view.show @subview    
+    @view.show @subview
     expect(@subview.showAnimation).toHaveBeenCalled()
     expect(@subview.render).toHaveBeenCalled()
 
@@ -200,7 +200,7 @@ describe "Check show functionality:",->
     @subview.on "onShow",-> onShow+= 1
     @subview.on "onBeforeClose",-> onBeforeClose+=1
     @subview.on "onClose",-> onClose+=1
-    @view.show @subview  
+    @view.show @subview
     expect(bRender).toEqual 1
     expect(onBeforeShow).toEqual 1
     expect(onShow).toEqual 1
@@ -234,16 +234,16 @@ describe "Check show functionality:",->
     @view.close @view
     expect(@subview.closeViewAnimation).toHaveBeenCalled()
 
-  it "check close parent and close child region",->    
+  it "check close parent and close child region",->
     onCloseCounter = 0
     onShowCounter = 0
     SuperClass = MixinBackbone(Backbone.View)
-    RegionView = SuperClass.extend 
+    RegionView = SuperClass.extend
       onClose:->
         onCloseCounter += 1
       onShow:->
         onShowCounter += 1
-    SubView = SuperClass.extend 
+    SubView = SuperClass.extend
       regions: test: el:".test", view: RegionView
 
     subview = new SubView
@@ -266,8 +266,8 @@ describe "Check show functionality:",->
     SuperClass = MixinBackbone(Backbone.View)
 
     RegionView = SuperClass.extend {}
-      
-    SubView = SuperClass.extend 
+
+    SubView = SuperClass.extend
       regions: test: el:".test", view: RegionView
 
     subview = new SubView
@@ -275,7 +275,7 @@ describe "Check show functionality:",->
     spyOn subview.test, "render"
     @view.show subview
     expect(subview.render).toHaveBeenCalled()
-    expect(subview.test.render).toHaveBeenCalled()    
+    expect(subview.test.render).toHaveBeenCalled()
 
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
@@ -309,11 +309,12 @@ describe "check functionality when setElement call",->
     @view.remove()
 
   it "check ui",->
+    debugger
     @view.ui.test.trigger "click"
-    expect(@view.click_counter).toEqual(1)
+    expect(1).toEqual @view.click_counter
     @view.setElement $("<div>")
     @view.ui.test.trigger "click"
-    expect(@view.click_counter).toEqual(2)
+    expect(2).toEqual @view.click_counter
 
   it "check regions binding",->
     $old = @view.test.$el
