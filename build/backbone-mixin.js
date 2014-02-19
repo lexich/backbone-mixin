@@ -77,11 +77,10 @@ MixinBackbone = function(Backbone) {
         if (_view == null) {
           return;
         }
-        if (this !== currentView) {
+        if ((currentView != null) && this !== currentView) {
           this.close(currentView);
-        } else {
-          currentView = null;
         }
+        currentView = null;
         view = this.getViewDI(_view, options);
         if (this !== view) {
           currentView = view;
@@ -92,13 +91,13 @@ MixinBackbone = function(Backbone) {
       },
       showCurrent: function() {
         var regions;
+        this.trigger("onBeforeShow");
+        _.result(this, "onBeforeShow");
         if (this._$_oneShow == null) {
           this._$_oneShow = true;
-          if (typeof this.render === "function") {
-            this.render();
-          }
+          this.trigger("render");
+          this.render();
         }
-        _.result(this, "onBeforeShow");
         if ((regions = _.result(this, "regions"))) {
           _.each(regions, (function(_this) {
             return function(v, k) {
@@ -107,10 +106,13 @@ MixinBackbone = function(Backbone) {
           })(this));
         }
         this.showAnimation();
+        this.trigger("onShow");
         return _.result(this, "onShow");
       },
       closeCurrent: function() {
         var regions;
+        this.trigger("onBeforeClose");
+        _.result(this, "onBeforeClose");
         if ((regions = _.result(this, "regions"))) {
           _.each(regions, (function(_this) {
             return function(v, k) {
@@ -118,8 +120,8 @@ MixinBackbone = function(Backbone) {
             };
           })(this));
         }
-        _.result(this, "onBeforeClose");
         this.closeAnimation();
+        this.trigger("onClose");
         return _.result(this, "onClose");
       },
       close: function(_view) {

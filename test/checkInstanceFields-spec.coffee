@@ -182,13 +182,32 @@ describe "Check show functionality:",->
     @view.remove()  
 
   it "check exec close after show",->
-    spyOn @view, "close"
     spyOn @subview, "showAnimation"
     spyOn @subview, "render"
-    @view.show @subview
-    expect(@view.close).toHaveBeenCalled()
+    @view.show @subview    
     expect(@subview.showAnimation).toHaveBeenCalled()
     expect(@subview.render).toHaveBeenCalled()
+
+
+  it "check triggers",->
+    bRender = 0
+    onBeforeShow = 0
+    onShow = 0
+    onBeforeClose= 0
+    onClose = 0
+    @subview.on "onBeforeShow",-> onBeforeShow +=1
+    @subview.on "render",->  bRender+= 1
+    @subview.on "onShow",-> onShow+= 1
+    @subview.on "onBeforeClose",-> onBeforeClose+=1
+    @subview.on "onClose",-> onClose+=1
+    @view.show @subview  
+    expect(bRender).toEqual 1
+    expect(onBeforeShow).toEqual 1
+    expect(onShow).toEqual 1
+
+    @view.close @subview
+    expect(onBeforeClose).toEqual 1
+    expect(onClose).toEqual 1
 
   it "check not double exec rerender from subview",->
     spyOn @subview, "showViewAnimation"

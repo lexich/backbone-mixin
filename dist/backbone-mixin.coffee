@@ -48,10 +48,8 @@ MixinBackbone = (Backbone)->
 
       show:(_view, options = {})->
         return unless _view?
-        if this isnt currentView
-          @close currentView
-        else
-          currentView = null
+        @close currentView if currentView? and this isnt currentView
+        currentView = null
         view = @getViewDI _view, options
         if this isnt view
           currentView = view
@@ -60,26 +58,31 @@ MixinBackbone = (Backbone)->
         view
 
       showCurrent:->
+        this.trigger "onBeforeShow"
+        _.result(this,"onBeforeShow")
         unless @_$_oneShow?
           @_$_oneShow = true
-          @render?()
-        _.result(this,"onBeforeShow")
+          this.trigger "render"
+          @render()
         if(regions = _.result(this,"regions"))
           _.each regions, (v,k)=> this[k].showCurrent()
         @showAnimation()
+        this.trigger "onShow"
         _.result(this,"onShow")
         
       closeCurrent:->
+        this.trigger "onBeforeClose"
+        _.result(this,"onBeforeClose")
         if(regions = _.result(this,"regions"))
           _.each regions, (v,k)=> this[k].closeCurrent()        
-        _.result(this,"onBeforeClose")
-        @closeAnimation()                
+        
+        @closeAnimation()
+        this.trigger "onClose"     
         _.result(this,"onClose")
 
       close:(_view)->
         return unless _view?
-        if currentView? and currentView isnt _view
-          @close currentView 
+        @close currentView  if currentView? and currentView isnt _view          
         currentView = null
         _view.closeCurrent()
         _view
