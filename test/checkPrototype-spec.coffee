@@ -1,8 +1,10 @@
 describe "Check MixinBackbone prototype", ->
   beforeEach ->
     @TestView = MixinBackbone(Backbone.View)
-  it "check TestView::_diViews",->
-    expect(!!@TestView::_diViews).toBeTruthy()
+  it "check TestView::_diViewsKeys",->
+    expect(!!@TestView::_diViewsKeys).toBeTruthy()
+  it "check TestView::_diViewsValues",->
+    expect(!!@TestView::_diViewsValues).toBeTruthy()
   it "check TestView::show",->
     expect(!!@TestView::show).toBeTruthy()
   it "check TestView::close",->

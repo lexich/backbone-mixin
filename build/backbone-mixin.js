@@ -3,30 +3,39 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   var Region;
   MixinBackbone = function(BaseClass) {
+    var currentView, diViews, removeFlag;
+    currentView = null;
+    diViews = {};
+    removeFlag = false;
     return BaseClass.extend({
-      _diViews: {},
-      _currentView: null,
       setElement: function() {
         BaseClass.prototype.setElement.apply(this, arguments);
-        this.__$_$removeFlag = false;
         this.reloadTemplate();
         this.bindUIElements();
         this.bindRegions();
         return this.bindUIEpoxy();
       },
       remove: function() {
-        if (this.__$_$removeFlag === true) {
+        var k, view;
+        if (removeFlag === true) {
           return this;
         } else {
-          this.__$_$removeFlag = true;
+          removeFlag = true;
         }
         BaseClass.prototype.remove.apply(this, arguments);
         this.unbindRegions();
         this.unbindUIElements();
-        _.each(this._diViews, function(view) {
-          return view.remove();
-        });
-        return this._diViews = {};
+        for (k in diViews) {
+          view = diViews[k];
+          view.remove();
+        }
+        return diViews = {};
+      },
+      _diViewsKeys: function() {
+        return _.keys(diViews);
+      },
+      _diViewsValues: function() {
+        return _.values(diViews);
       },
       delegateEvents: function(events) {
         var _ref;
@@ -66,56 +75,61 @@ MixinBackbone = function(Backbone) {
         if (_view == null) {
           return;
         }
-        if (this !== this._currentView) {
-          this.close(this._currentView);
+        if (this !== currentView) {
+          this.close(currentView);
         } else {
-          this._currentView = null;
+          currentView = null;
         }
         view = this.getViewDI(_view, options);
         if (this !== view) {
-          this._currentView = view;
+          currentView = view;
         }
         this.$el.append(view.$el);
-        if (view._$_oneShow == null) {
-          view._$_oneShow = true;
-          if (typeof view.render === "function") {
-            view.render();
+        view.showCurrent();
+        return view;
+      },
+      showCurrent: function() {
+        var regions;
+        if (this._$_oneShow == null) {
+          this._$_oneShow = true;
+          if (typeof this.render === "function") {
+            this.render();
           }
         }
-        if (typeof view.onBeforeShow === "function") {
-          view.onBeforeShow();
+        _.result(this, "onBeforeShow");
+        if ((regions = _.result(this, "regions"))) {
+          _.each(regions, (function(_this) {
+            return function(v, k) {
+              return _this[k].showCurrent();
+            };
+          })(this));
         }
-        if (view.regions != null) {
-          _.each(view.regions, function(v, k) {
-            return view[k].show(view[k]);
-          });
+        this.showAnimation();
+        return _.result(this, "onShow");
+      },
+      closeCurrent: function() {
+        var regions;
+        if ((regions = _.result(this, "regions"))) {
+          _.each(regions, (function(_this) {
+            return function(v, k) {
+              return _this[k].closeCurrent();
+            };
+          })(this));
         }
-        this.showViewAnimation(view);
-        if (typeof view.onShow === "function") {
-          view.onShow();
-        }
-        return view;
+        _.result(this, "onBeforeClose");
+        this.closeAnimation();
+        return _.result(this, "onClose");
       },
       close: function(_view) {
         if (_view == null) {
           return;
         }
-        if ((this._currentView != null) && this._currentView !== _view) {
-          this.close(this._currentView);
+        if ((currentView != null) && currentView !== _view) {
+          this.close(currentView);
         }
-        this._currentView = null;
-        if (_view.regions != null) {
-          _.each(_view.regions, function(v, k) {
-            var reg;
-            reg = _view[k];
-            return reg.close(reg);
-          });
-        }
-        if (typeof _view.onBeforeClose === "function") {
-          _view.onBeforeClose();
-        }
-        this.closeViewAnimation(_view);
-        return typeof _view.onClose === "function" ? _view.onClose() : void 0;
+        currentView = null;
+        _view.closeCurrent();
+        return _view;
       },
       showAnimation: function() {
         return this.showViewAnimation(this);
@@ -151,7 +165,7 @@ MixinBackbone = function(Backbone) {
         if (ViewClass.cid != null) {
           TypeView = ViewClass.constructor;
           key = ViewClass.cid;
-          this._diViews[key] = ViewClass;
+          diViews[key] = ViewClass;
         } else if (typeof ViewClass === "function") {
           TypeView = ViewClass;
           key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
@@ -160,10 +174,10 @@ MixinBackbone = function(Backbone) {
           TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
-        if (this._diViews[key] == null) {
-          this._diViews[key] = new TypeView(options);
+        if (diViews[key] == null) {
+          diViews[key] = new TypeView(options);
         }
-        return this._diViews[key];
+        return diViews[key];
       },
       reloadTemplate: function() {
         var $el, data, template;

@@ -144,11 +144,11 @@ describe "Check MixinBackbone DI",->
   it "check DI clean memory",->
     view = new @TestView
     diView = view.getViewDI @TestViewDI
-    expect(_.keys(view._diViews).length).toEqual 1
+    expect(view._diViewsKeys().length).toEqual 1
     spyOn(diView,"remove")
     view.remove()
     expect(diView.remove).toHaveBeenCalled()
-    expect(_.keys(view._diViews).length).toEqual 0
+    expect(view._diViewsKeys().length).toEqual 0
 
   it "checks DI preserve class",->
     view1 = @view.getViewDI @TestViewDI
@@ -167,7 +167,7 @@ describe "Check MixinBackbone DI",->
     view2 = @view.getViewDI type:@TestViewDI, key:"2"
     expect(view1).not.toEqual view2
 
-describe "Check show functionality",->
+describe "Check show functionality:",->
   beforeEach ->
     TestView = MixinBackbone(Backbone.View).extend {
       initialize:->
@@ -180,19 +180,15 @@ describe "Check show functionality",->
     @subview = new TestView
 
   afterEach ->
-    @view.remove()
-
-  it "check _currentView",->
-    @view.show @subview
-    expect(@view._currentView).toEqual @subview
+    @view.remove()  
 
   it "check exec close after show",->
     spyOn @view, "close"
-    spyOn @view, "showViewAnimation"
+    spyOn @subview, "showAnimation"
     spyOn @subview, "render"
     @view.show @subview
     expect(@view.close).toHaveBeenCalled()
-    expect(@view.showViewAnimation).toHaveBeenCalled()
+    expect(@subview.showAnimation).toHaveBeenCalled()
     expect(@subview.render).toHaveBeenCalled()
 
   it "check not double exec rerender from subview",->

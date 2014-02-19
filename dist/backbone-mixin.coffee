@@ -1,26 +1,28 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
-    BaseClass.extend
-      _diViews:{}
+    currentView = null
+    diViews = {}
+    removeFlag = false
 
-      _currentView:null
+    BaseClass.extend      
 
       setElement:->
-        BaseClass::setElement.apply this, arguments
-        @__$_$removeFlag = false
+        BaseClass::setElement.apply this, arguments        
         @reloadTemplate()
         @bindUIElements()
         @bindRegions()
         @bindUIEpoxy()
 
       remove:->
-        if @__$_$removeFlag is true then return this else @__$_$removeFlag = true
+        if removeFlag is true then return this else removeFlag = true
         BaseClass::remove.apply this, arguments
         @unbindRegions()
         @unbindUIElements()
-        _.each @_diViews,(view)->
-          view.remove()
-        @_diViews = {}
+        view.remove() for k,view of diViews
+        diViews = {}
+
+      _diViewsKeys:-> _.keys(diViews)
+      _diViewsValues:-> _.values(diViews)
 
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
@@ -44,39 +46,41 @@ MixinBackbone = (Backbone)->
 
       show:(_view, options = {})->
         return unless _view?
-        if this isnt @_currentView
-          @close @_currentView
+        if this isnt currentView
+          @close currentView
         else
-          @_currentView = null
+          currentView = null
         view = @getViewDI _view, options
         if this isnt view
-          @_currentView = view
+          currentView = view
         @$el.append view.$el
-        unless view._$_oneShow?
-          view._$_oneShow = true
-          view.render?()
-        view.onBeforeShow?()
-        if view.regions?
-          _.each view.regions, (v,k)->
-            view[k].show view[k]
-        @showViewAnimation view
-        view.onShow?()
+        view.showCurrent()        
         view
+
+      showCurrent:->
+        unless @_$_oneShow?
+          @_$_oneShow = true
+          @render?()
+        _.result(this,"onBeforeShow")
+        if(regions = _.result(this,"regions"))
+          _.each regions, (v,k)=> this[k].showCurrent()
+        @showAnimation()
+        _.result(this,"onShow")
+        
+      closeCurrent:->
+        if(regions = _.result(this,"regions"))
+          _.each regions, (v,k)=> this[k].closeCurrent()        
+        _.result(this,"onBeforeClose")
+        @closeAnimation()                
+        _.result(this,"onClose")
 
       close:(_view)->
         return unless _view?
-        if @_currentView? and @_currentView isnt _view
-          @close @_currentView 
-        @_currentView = null
-        #close regions
-        if _view.regions?
-          _.each _view.regions, (v,k)->
-            reg = _view[k]
-            reg.close reg
-
-        _view.onBeforeClose?()
-        @closeViewAnimation _view
-        _view.onClose?()
+        if currentView? and currentView isnt _view
+          @close currentView 
+        currentView = null
+        _view.closeCurrent()
+        _view
 
       showAnimation:->
         @showViewAnimation this
@@ -102,7 +106,7 @@ MixinBackbone = (Backbone)->
         if ViewClass.cid?
           TypeView = ViewClass.constructor
           key = ViewClass.cid
-          @_diViews[key] = ViewClass
+          diViews[key] = ViewClass
         else if typeof(ViewClass) is "function"
           TypeView = ViewClass
           key = TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
@@ -110,9 +114,9 @@ MixinBackbone = (Backbone)->
           TypeView = ViewClass.type
           TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
           key =  ViewClass.key
-        unless @_diViews[key]?
-          @_diViews[key] = new TypeView options
-        @_diViews[key]
+        unless diViews[key]?
+          diViews[key] = new TypeView options
+        diViews[key]
 
       reloadTemplate:->
         template = null
