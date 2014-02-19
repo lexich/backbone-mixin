@@ -61,8 +61,7 @@ describe "Check MixinBackbone bindUIElements",->
     @view.remove()
 
   it "check ui",->
-    expect(!!@view.ui).toBeTruthy()
-    expect(!!@view.__bindUIElements).toBeTruthy()
+    expect(!!@view.ui).toBeTruthy()    
     expect(_.size(_.keys(@view.ui))).toEqual(2)
     expect(!!@view.ui.hello).toBeTruthy()
     expect(!!@view.ui.bye).toBeTruthy()

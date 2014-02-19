@@ -3,10 +3,12 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   var Region;
   MixinBackbone = function(BaseClass) {
-    var currentView, diViews, removeFlag;
+    var currentView, diViews, removeFlag, var_bindings, varbindUIElements;
     currentView = null;
     diViews = {};
     removeFlag = false;
+    varbindUIElements = null;
+    var_bindings = null;
     return BaseClass.extend({
       setElement: function() {
         BaseClass.prototype.setElement.apply(this, arguments);
@@ -40,7 +42,7 @@ MixinBackbone = function(Backbone) {
       delegateEvents: function(events) {
         var _ref;
         events || (events = _.result(this, 'events'));
-        if ((this.__bindUIElements != null) && (events != null)) {
+        if ((varbindUIElements != null) && (events != null)) {
           events = _.reduce(events, ((function(_this) {
             return function(memo, v, k) {
               var part, result, selector, _i, _len;
@@ -49,7 +51,7 @@ MixinBackbone = function(Backbone) {
                 for (_i = 0, _len = result.length; _i < _len; _i++) {
                   part = result[_i];
                   if (/@ui\.([^ ,]+)/.exec(part) != null) {
-                    selector = _this.__bindUIElements[RegExp.$1];
+                    selector = varbindUIElements[RegExp.$1];
                     k = k.replace(part, selector);
                   }
                 }
@@ -201,58 +203,66 @@ MixinBackbone = function(Backbone) {
         }
       },
       unbindRegions: function() {
+        var k, v, _ref, _results;
         if (!this.regions) {
           return;
         }
-        return _.each(this.regions, (function(_this) {
-          return function(v, k) {
-            _this[k].remove();
-            return delete _this[k];
-          };
-        })(this));
+        _ref = this.regions;
+        _results = [];
+        for (k in _ref) {
+          v = _ref[k];
+          this[k].remove();
+          _results.push(delete this[k]);
+        }
+        return _results;
       },
       bindRegions: function() {
+        var View, el, k, v, _ref, _results;
         if (!this.regions) {
           return;
         }
-        return _.each(this.regions, (function(_this) {
-          return function(v, k) {
-            var View, el;
-            if (_.isObject(v)) {
-              el = _.isString(v.el) ? _this.$el.find(v.el) : el = v.el;
-              View = v.view;
-            } else {
-              el = _this.$el.find(v);
-              View = Region;
-            }
-            if (_this[k] != null) {
-              return _this[k].setElement(el);
-            } else {
-              return _this[k] = new View({
-                el: el
-              });
-            }
-          };
-        })(this));
+        _ref = this.regions;
+        _results = [];
+        for (k in _ref) {
+          v = _ref[k];
+          if (_.isObject(v)) {
+            el = _.isString(v.el) ? this.$el.find(v.el) : el = v.el;
+            View = v.view;
+          } else {
+            el = this.$el.find(v);
+            View = Region;
+          }
+          if (this[k] != null) {
+            _results.push(this[k].setElement(el));
+          } else {
+            _results.push(this[k] = new View({
+              el: el
+            }));
+          }
+        }
+        return _results;
       },
       bindUIElements: function() {
+        var k, v, _results;
         if (this.ui == null) {
           return;
         }
         this.unbindUIElements();
-        this.__bindUIElements = _.extend({}, this.ui);
+        varbindUIElements = _.extend({}, this.ui);
         this.ui = {};
-        return _.each(this.__bindUIElements, (function(_this) {
-          return function(v, k, ui) {
-            return _this.ui[k] = _this.$el.find(v);
-          };
-        })(this));
+        _results = [];
+        for (k in varbindUIElements) {
+          v = varbindUIElements[k];
+          _results.push(this.ui[k] = this.$el.find(v));
+        }
+        return _results;
       },
       unbindUIElements: function() {
-        if (this.__bindUIElements == null) {
+        if (varbindUIElements == null) {
           return;
         }
-        return this.ui = _.extend({}, this.__bindUIElements);
+        this.ui = varbindUIElements;
+        return varbindUIElements = null;
       },
       bindUIEpoxy: function() {
         var rx;
@@ -260,13 +270,13 @@ MixinBackbone = function(Backbone) {
           return;
         }
         this.unbindUIEpoxy();
-        this.__bindings = this.bindings;
+        var_bindings = this.bindings;
         rx = /@ui\.([^ ]+)/;
-        return this.bindings = _.reduce(this.__bindings, ((function(_this) {
+        return this.bindings = _.reduce(var_bindings, ((function(_this) {
           return function(memo, v, k) {
             var key, selector;
             if (rx.exec(k) != null) {
-              selector = _this.__bindUIElements[RegExp.$1];
+              selector = varbindUIElements[RegExp.$1];
               key = k.replace(rx, selector);
               memo[key] = v;
             } else {
@@ -277,10 +287,11 @@ MixinBackbone = function(Backbone) {
         })(this)), {});
       },
       unbindUIEpoxy: function() {
-        if (this.__bindings == null) {
+        if (var_bindings == null) {
           return;
         }
-        return this.bindings = _.extend({}, this.__bindings);
+        this.bindings = var_bindings;
+        return var_bindings = null;
       }
     });
   };

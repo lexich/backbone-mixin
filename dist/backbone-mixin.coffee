@@ -3,6 +3,8 @@ MixinBackbone = (Backbone)->
     currentView = null
     diViews = {}
     removeFlag = false
+    varbindUIElements = null
+    var_bindings = null
 
     BaseClass.extend      
 
@@ -26,12 +28,12 @@ MixinBackbone = (Backbone)->
 
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
-        if @__bindUIElements? and events?
+        if varbindUIElements? and events?
           events = _.reduce events, ((memo, v,k)=>
             result = k.match(/@ui\.[^ ,]+/g)
             if result? then for part in result
               if /@ui\.([^ ,]+)/.exec(part)?
-                selector = @__bindUIElements[RegExp.$1]
+                selector = varbindUIElements[RegExp.$1]
                 k = k.replace part, selector
             memo[k] = v
             memo
@@ -138,13 +140,13 @@ MixinBackbone = (Backbone)->
 
       unbindRegions:->
         return unless @regions
-        _.each @regions,(v,k)=>
+        for k,v of @regions        
           this[k].remove()
           delete this[k]
 
       bindRegions:->
         return unless @regions
-        _.each @regions,(v,k)=>
+        for k,v of @regions
           if _.isObject(v)
             el = if _.isString(v.el)
               @$el.find(v.el)
@@ -161,23 +163,24 @@ MixinBackbone = (Backbone)->
       bindUIElements:->
         return unless @ui?
         @unbindUIElements()
-        @__bindUIElements = _.extend {}, @ui
+        varbindUIElements = _.extend {}, @ui
         @ui = {}
-        _.each @__bindUIElements,(v,k,ui)=>
+        for k, v of varbindUIElements        
           @ui[k] = @$el.find v
 
       unbindUIElements:->
-        return unless @__bindUIElements?
-        @ui = _.extend {}, @__bindUIElements
+        return unless varbindUIElements?
+        @ui = varbindUIElements
+        varbindUIElements = null
 
       bindUIEpoxy:->
         return unless @bindings
         @unbindUIEpoxy()
-        @__bindings = @bindings
+        var_bindings = @bindings
         rx = /@ui\.([^ ]+)/
-        @bindings = _.reduce @__bindings, ((memo, v,k)=>
+        @bindings = _.reduce var_bindings, ((memo, v,k)=>
           if rx.exec(k)?
-            selector = @__bindUIElements[RegExp.$1]
+            selector = varbindUIElements[RegExp.$1]
             key = k.replace rx, selector
             memo[key] = v
           else
@@ -186,8 +189,9 @@ MixinBackbone = (Backbone)->
         ),{}
 
       unbindUIEpoxy:->
-        return unless @__bindings?
-        @bindings = _.extend {}, @__bindings
+        return unless var_bindings?
+        @bindings = var_bindings
+        var_bindings = null
 
   Region = MixinBackbone(Backbone.View).extend {}
 
