@@ -59,26 +59,28 @@ MixinBackbone = (Backbone)->
 
       showCurrent:->
         this.trigger "onBeforeShow"
-        _.result(this,"onBeforeShow")
+        @onBeforeShow?()
         unless @_$_oneShow?
           @_$_oneShow = true
           this.trigger "render"
           @render()
         if(regions = _.result(this,"regions"))
-          _.each regions, (v,k)=> this[k].showCurrent()
+          for k,v of regions
+            this[k].showCurrent()
         @showAnimation()
         this.trigger "onShow"
-        _.result(this,"onShow")
+        @onShow?()
         
       closeCurrent:->
         this.trigger "onBeforeClose"
-        _.result(this,"onBeforeClose")
+        @onBeforeClose?()
         if(regions = _.result(this,"regions"))
-          _.each regions, (v,k)=> this[k].closeCurrent()        
+          for k,v of regions
+            this[k].closeCurrent()        
         
         @closeAnimation()
         this.trigger "onClose"     
-        _.result(this,"onClose")
+        @onClose?()
 
       close:(_view)->
         return unless _view?

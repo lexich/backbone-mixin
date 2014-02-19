@@ -90,39 +90,41 @@ MixinBackbone = function(Backbone) {
         return view;
       },
       showCurrent: function() {
-        var regions;
+        var k, regions, v;
         this.trigger("onBeforeShow");
-        _.result(this, "onBeforeShow");
+        if (typeof this.onBeforeShow === "function") {
+          this.onBeforeShow();
+        }
         if (this._$_oneShow == null) {
           this._$_oneShow = true;
           this.trigger("render");
           this.render();
         }
         if ((regions = _.result(this, "regions"))) {
-          _.each(regions, (function(_this) {
-            return function(v, k) {
-              return _this[k].showCurrent();
-            };
-          })(this));
+          for (k in regions) {
+            v = regions[k];
+            this[k].showCurrent();
+          }
         }
         this.showAnimation();
         this.trigger("onShow");
-        return _.result(this, "onShow");
+        return typeof this.onShow === "function" ? this.onShow() : void 0;
       },
       closeCurrent: function() {
-        var regions;
+        var k, regions, v;
         this.trigger("onBeforeClose");
-        _.result(this, "onBeforeClose");
+        if (typeof this.onBeforeClose === "function") {
+          this.onBeforeClose();
+        }
         if ((regions = _.result(this, "regions"))) {
-          _.each(regions, (function(_this) {
-            return function(v, k) {
-              return _this[k].closeCurrent();
-            };
-          })(this));
+          for (k in regions) {
+            v = regions[k];
+            this[k].closeCurrent();
+          }
         }
         this.closeAnimation();
         this.trigger("onClose");
-        return _.result(this, "onClose");
+        return typeof this.onClose === "function" ? this.onClose() : void 0;
       },
       close: function(_view) {
         if (_view == null) {
