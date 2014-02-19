@@ -1,7 +1,6 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  var Region;
   MixinBackbone = function(BaseClass) {
     var currentView, diViews, removeFlag, var_bindings, varbindUIElements;
     currentView = null;
@@ -234,7 +233,7 @@ MixinBackbone = function(Backbone) {
             View = v.view;
           } else {
             el = this.$el.find(v);
-            View = Region;
+            View = MixinBackbone(Backbone.View);
           }
           if (this[k] != null) {
             _results.push(this[k].setElement(el));
@@ -299,7 +298,6 @@ MixinBackbone = function(Backbone) {
       }
     });
   };
-  Region = MixinBackbone(Backbone.View).extend({});
   return MixinBackbone;
 };
 

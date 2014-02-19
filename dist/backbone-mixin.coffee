@@ -6,10 +6,10 @@ MixinBackbone = (Backbone)->
     varbindUIElements = null
     var_bindings = null
 
-    BaseClass.extend      
+    BaseClass.extend
 
       setElement:->
-        BaseClass::setElement.apply this, arguments        
+        BaseClass::setElement.apply this, arguments
         @reloadTemplate()
         @bindUIElements()
         @bindRegions()
@@ -54,7 +54,7 @@ MixinBackbone = (Backbone)->
         if this isnt view
           currentView = view
         @$el.append view.$el
-        view.showCurrent()        
+        view.showCurrent()
         view
 
       showCurrent:->
@@ -70,21 +70,21 @@ MixinBackbone = (Backbone)->
         @showAnimation()
         this.trigger "onShow"
         @onShow?()
-        
+
       closeCurrent:->
         this.trigger "onBeforeClose"
         @onBeforeClose?()
         if(regions = _.result(this,"regions"))
           for k,v of regions
-            this[k].closeCurrent()        
-        
+            this[k].closeCurrent()
+
         @closeAnimation()
-        this.trigger "onClose"     
+        this.trigger "onClose"
         @onClose?()
 
       close:(_view)->
         return unless _view?
-        @close currentView  if currentView? and currentView isnt _view          
+        @close currentView  if currentView? and currentView isnt _view
         currentView = null
         _view.closeCurrent()
         _view
@@ -145,7 +145,7 @@ MixinBackbone = (Backbone)->
 
       unbindRegions:->
         return unless @regions
-        for k,v of @regions        
+        for k,v of @regions
           this[k].remove()
           delete this[k]
 
@@ -160,7 +160,7 @@ MixinBackbone = (Backbone)->
             View = v.view
           else
             el = @$el.find(v)
-            View = Region
+            View = MixinBackbone(Backbone.View)
 
           if this[k]? then this[k].setElement el
           else this[k] = new View {el}
@@ -170,7 +170,7 @@ MixinBackbone = (Backbone)->
         @unbindUIElements()
         varbindUIElements = _.extend {}, @ui
         @ui = {}
-        for k, v of varbindUIElements        
+        for k, v of varbindUIElements
           @ui[k] = @$el.find v
 
       unbindUIElements:->
@@ -197,8 +197,6 @@ MixinBackbone = (Backbone)->
         return unless var_bindings?
         @bindings = var_bindings
         var_bindings = null
-
-  Region = MixinBackbone(Backbone.View).extend {}
 
   MixinBackbone
 
