@@ -115,6 +115,9 @@ MixinBackbone = function(Backbone) {
             this[k].showCurrent();
           }
         }
+        if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
+          this._$_p.currentView.showCurrent();
+        }
         this.showAnimation();
         this.trigger("onShow");
         return typeof this.onShow === "function" ? this.onShow() : void 0;
@@ -130,6 +133,9 @@ MixinBackbone = function(Backbone) {
             v = regions[k];
             this[k].closeCurrent();
           }
+        }
+        if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
+          this._$_p.currentView.closeCurrent();
         }
         this.closeAnimation();
         this.trigger("onClose");

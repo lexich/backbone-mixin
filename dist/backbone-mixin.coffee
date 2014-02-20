@@ -71,6 +71,8 @@ MixinBackbone = (Backbone)->
         if(regions = _.result(this,"regions"))
           for k,v of regions
             this[k].showCurrent()
+        if @_$_p.currentView? and @_$_p.currentView isnt this
+          @_$_p.currentView.showCurrent()
         @showAnimation()
         this.trigger "onShow"
         @onShow?()
@@ -81,7 +83,8 @@ MixinBackbone = (Backbone)->
         if(regions = _.result(this,"regions"))
           for k,v of regions
             this[k].closeCurrent()
-
+        if @_$_p.currentView? and @_$_p.currentView isnt this
+          @_$_p.currentView.closeCurrent()
         @closeAnimation()
         this.trigger "onClose"
         @onClose?()
