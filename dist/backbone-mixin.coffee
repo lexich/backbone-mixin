@@ -51,9 +51,10 @@ MixinBackbone = (Backbone)->
 
       show:(_view, options = {})->
         return unless _view?
+        view = @getViewDI _view, options
+        return if view is @_$_p.currentView
         @close @_$_p.currentView if @_$_p.currentView? and this isnt @_$_p.currentView
         @_setCurrentView null
-        view = @getViewDI _view, options
         if this isnt view
           @_setCurrentView view
         @$el.append view.$el

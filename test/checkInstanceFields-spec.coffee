@@ -188,6 +188,14 @@ describe "Check show functionality:",->
     expect(@subview.showAnimation).toHaveBeenCalled()
     expect(@subview.render).toHaveBeenCalled()
 
+  it "check not call close -> open for reopen view",->
+    spyOn @subview, "closeCurrent"
+    @view.show @subview
+    expect(@subview.closeCurrent).not.toHaveBeenCalled()
+    @view.show @subview
+    expect(@subview.closeCurrent).not.toHaveBeenCalled()
+    @view.close @subview
+    expect(@subview.closeCurrent).toHaveBeenCalled()
 
   it "check triggers",->
     bRender = 0
@@ -215,7 +223,6 @@ describe "Check show functionality:",->
     @view.show @subview
     expect(@subview.showViewAnimation).toHaveBeenCalled()
     @view.show @subview
-    expect(@subview.closeViewAnimation).toHaveBeenCalled()
     expect(@subview.render_counter).toEqual 1
 
   it "check showAnimation",->
@@ -285,6 +292,7 @@ describe "Check show functionality:",->
   it "check setNeedRerender",->
     @view.show @subview
     @subview.setNeedRerender()
+    @view.close @subview
     @view.show @subview
     expect(@subview.render_counter).toEqual 2
 

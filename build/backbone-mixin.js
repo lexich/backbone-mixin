@@ -83,11 +83,14 @@ MixinBackbone = function(Backbone) {
         if (_view == null) {
           return;
         }
+        view = this.getViewDI(_view, options);
+        if (view === this._$_p.currentView) {
+          return;
+        }
         if ((this._$_p.currentView != null) && this !== this._$_p.currentView) {
           this.close(this._$_p.currentView);
         }
         this._setCurrentView(null);
-        view = this.getViewDI(_view, options);
         if (this !== view) {
           this._setCurrentView(view);
         }
