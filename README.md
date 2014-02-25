@@ -76,9 +76,10 @@ regions:{
     view: (HelloView = MixinBackbone(Backbone.View).extend({
     }))
   },
-  render:function(){
-    this.hello.$el === this.$el.find(".hello_selector");
-  }
+}
+
+render:function(){
+  this.hello.$el === this.$el.find(".hello_selector");
 }
 ```
 when view render with "show" mechanizm then all regions call render
