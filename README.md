@@ -131,7 +131,7 @@ Depedencies Injection functionality
 Type `Function`
 callback caller,  execute when view base view `show` this view
 
-#### onHide
+#### onClose
 Type `Function`
 callback caller, execute when view base view `close` this view
 
