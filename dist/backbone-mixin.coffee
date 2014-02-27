@@ -1,7 +1,7 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
-
+      # @overwrite default Backbone method Backbone.View.setElement      
       setElement:->
         unless @_$_p?
           @_$_p =
@@ -16,6 +16,7 @@ MixinBackbone = (Backbone)->
         @bindRegions()
         @bindUIEpoxy()
 
+      # @overwrite default Backbone method Backbone.View.remove   
       remove:->
         if @_$_p.removeFlag is true then return this else @_$_p.removeFlag = true
         BaseClass::remove.apply this, arguments
@@ -24,9 +25,7 @@ MixinBackbone = (Backbone)->
         view.remove() for k,view of @_$_p.diViews
         @_$_p.diViews = {}
 
-      _diViewsKeys:-> _.keys(@_$_p.diViews)
-      _diViewsValues:-> _.values(@_$_p.diViews)
-
+      # @overwrite default Backbone method Backbone.View.delegateEvents
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
         if @_$_p.varbindUIElements? and events?
@@ -41,9 +40,17 @@ MixinBackbone = (Backbone)->
           ),{}
         BaseClass::delegateEvents?.call this, events
 
+      # Get keys of all DI views
+      _diViewsKeys:-> _.keys(@_$_p.diViews)
+
+      # Get all DI views
+      _diViewsValues:-> _.values(@_$_p.diViews)
+
+      # `show` mechanizm call `view.render` function only while first calling. `setNeedRerenderView` forse call `view.render` function once again
       setNeedRerenderView:(view)->
         view._$_oneShow = null
 
+      # Alias setNeedRerenderView(this)
       setNeedRerender:->
         @setNeedRerenderView this
 
@@ -96,19 +103,22 @@ MixinBackbone = (Backbone)->
         _view.closeCurrent()
         _view
 
+      # Alias showViewAnimation(this)
       showAnimation:->
         @showViewAnimation this
 
+      # Alias closeViewAnimation(this)
       closeAnimation:->
         @closeViewAnimation this
 
+      # Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
       showViewAnimation:(view)->
         return unless view?
         if view.showAnimation? and view isnt this
           view.showAnimation()
         else
           view.$el.show()
-
+      # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view)->
         return unless view?
         if view.closeAnimation? and view isnt this
@@ -116,6 +126,14 @@ MixinBackbone = (Backbone)->
         else
           view.$el.hide()
 
+      # Depedencies Injection functionality
+      # `options` - options for `new View(options)`  operations
+      # `ViewParams`
+      #  - type `Backbone.View` - if you use this View only once in ypu application
+      #  - type `instance Backbone.View` - if you save instance ny ViewParams.cid
+      #  - type `object` - usefull for multiple using Views
+      #    - type: `Backbone.View` - View prototype
+      #    - key: `String` - key for different instace
       getViewDI:(ViewClass, options = {})->
         if ViewClass.cid?
           TypeView = ViewClass.constructor
@@ -207,7 +225,7 @@ MixinBackbone = (Backbone)->
 
   MixinBackbone
 
-
+# AMD support
 if (typeof define is 'function') and (typeof define.amd is 'object') and define.amd
   define ["backbone"], (Backbone)-> MixinBackbone(Backbone)
 else
