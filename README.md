@@ -1,3 +1,5 @@
+[docs](lexich.github.io/backbone-mixin/backbone-mixin.html)
+
 [![Build Status](https://travis-ci.org/lexich/backbone-mixin.png?branch=master)](https://travis-ci.org/lexich/backbone-mixin)
 # Description
 Mixin for extend [Backbone.View](http://backbonejs.org/#View) or [Backbone.Epoxy.View](http://epoxyjs.org/documentation.html#view)  
