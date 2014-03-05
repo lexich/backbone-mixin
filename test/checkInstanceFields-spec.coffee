@@ -299,6 +299,7 @@ describe "Check show functionality:",->
 describe "check functionality when setElement call",->
   beforeEach ->
     TestView = MixinBackbone(Backbone.View).extend
+      className:"testClass"
       ui:
         test:".test_template"
       events:
@@ -317,10 +318,11 @@ describe "check functionality when setElement call",->
     @view.remove()
 
   it "check ui",->
-    debugger
+    expect(true).toEqual @view.$el.hasClass "testClass"
     @view.ui.test.trigger "click"
     expect(1).toEqual @view.click_counter
     @view.setElement $("<div>")
+    expect(true).toEqual @view.$el.hasClass "testClass"
     @view.ui.test.trigger "click"
     expect(2).toEqual @view.click_counter
 
