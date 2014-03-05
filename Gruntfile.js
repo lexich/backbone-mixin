@@ -40,6 +40,14 @@ module.exports = function(grunt) {
         dest: "."
       }
     },
+    version:{
+      defaults:{
+        src:[
+          "build/*.js",
+          "bower.json"
+        ]
+      }
+    },
     karma: {
       options:{
         configFile: 'karma.conf.js',
@@ -68,4 +76,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-docco');
+  grunt.loadNpmTasks('grunt-version');
 };

@@ -1,6 +1,7 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
+      version:"0.0.0"
       # @overwrite default Backbone method Backbone.View.setElement      
       setElement:->
         unless @_$_p?
@@ -11,6 +12,7 @@ MixinBackbone = (Backbone)->
             varbindUIElements:null
             var_bindings:null
         BaseClass::setElement.apply this, arguments
+        @$el.addClass @className if @className?          
         @reloadTemplate()
         @bindUIElements()
         @bindRegions()

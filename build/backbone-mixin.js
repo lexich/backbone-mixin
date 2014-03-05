@@ -3,6 +3,7 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
+      version: "0.1.7",
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -14,6 +15,9 @@ MixinBackbone = function(Backbone) {
           };
         }
         BaseClass.prototype.setElement.apply(this, arguments);
+        if (this.className != null) {
+          this.$el.addClass(this.className);
+        }
         this.reloadTemplate();
         this.bindUIElements();
         this.bindRegions();
@@ -35,12 +39,6 @@ MixinBackbone = function(Backbone) {
           view.remove();
         }
         return this._$_p.diViews = {};
-      },
-      _diViewsKeys: function() {
-        return _.keys(this._$_p.diViews);
-      },
-      _diViewsValues: function() {
-        return _.values(this._$_p.diViews);
       },
       delegateEvents: function(events) {
         var _ref;
@@ -65,6 +63,12 @@ MixinBackbone = function(Backbone) {
           })(this)), {});
         }
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
+      },
+      _diViewsKeys: function() {
+        return _.keys(this._$_p.diViews);
+      },
+      _diViewsValues: function() {
+        return _.values(this._$_p.diViews);
       },
       setNeedRerenderView: function(view) {
         return view._$_oneShow = null;
