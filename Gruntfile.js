@@ -40,10 +40,21 @@ module.exports = function(grunt) {
         dest: "."
       }
     },
+    git_deploy:{
+      dist:{
+        options:{
+          url:"git@github.com:lexich/backbone-mixin.git",
+          branch:"gh-pages",
+          message:"update documentation"
+        },
+        src:"docs"
+      }
+    },
     version:{
-      defaults:{
+      dist:{
         src:[
           "build/*.js",
+          "dist/*.coffee",
           "bower.json"
         ]
       }
@@ -60,15 +71,20 @@ module.exports = function(grunt) {
       watch:{}
     }
   });  
-  grunt.registerTask('compile', [
+  grunt.registerTask('build', [
     'karma:dist',
     'clean:dist', 
     'coffee:dist', 
-    'uglify:dist'  
+    'uglify:dist',
+    'version:dist'
+  ]);
+  grunt.registerTask('docs', [
+    'docco:dist',
+    'git_deploy:dist'    
   ]);
 
   // By default, lint and run all tests.
-  grunt.registerTask('default', ['compile']);
+  grunt.registerTask('default', ['build']);
 
   // These plugins provide necessary tasks.  
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -77,4 +93,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-version');
+  grunt.loadNpmTasks('grunt-git-deploy');
 };

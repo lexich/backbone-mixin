@@ -3,7 +3,7 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-      version: "0.1.7",
+      version: "0.1.8",
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {

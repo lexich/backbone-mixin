@@ -1,7 +1,7 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
-      version:"0.0.0"
+      version:"0.1.8"
       # @overwrite default Backbone method Backbone.View.setElement      
       setElement:->
         unless @_$_p?
