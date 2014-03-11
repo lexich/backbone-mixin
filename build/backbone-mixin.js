@@ -3,7 +3,7 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-      version: "0.1.8",
+      version: "0.1.9",
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -122,9 +122,13 @@ MixinBackbone = function(Backbone) {
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
           this._$_p.currentView.showCurrent();
         }
-        this.showAnimation();
-        this.trigger("onShow");
-        return typeof this.onShow === "function" ? this.onShow() : void 0;
+        return this.showAnimation(function(view) {
+          if (view == null) {
+            return;
+          }
+          view.trigger("onShow");
+          return typeof view.onShow === "function" ? view.onShow() : void 0;
+        });
       },
       closeCurrent: function() {
         var k, regions, v;
@@ -141,9 +145,13 @@ MixinBackbone = function(Backbone) {
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
           this._$_p.currentView.closeCurrent();
         }
-        this.closeAnimation();
-        this.trigger("onClose");
-        return typeof this.onClose === "function" ? this.onClose() : void 0;
+        return this.closeAnimation(function(view) {
+          if (view == null) {
+            return;
+          }
+          view.trigger("onClose");
+          return typeof view.onClose === "function" ? view.onClose() : void 0;
+        });
       },
       close: function(_view) {
         if (_view == null) {
@@ -156,30 +164,32 @@ MixinBackbone = function(Backbone) {
         _view.closeCurrent();
         return _view;
       },
-      showAnimation: function() {
-        return this.showViewAnimation(this);
+      showAnimation: function(callback) {
+        return this.showViewAnimation(this, callback);
       },
-      closeAnimation: function() {
-        return this.closeViewAnimation(this);
+      closeAnimation: function(callback) {
+        return this.closeViewAnimation(this, callback);
       },
-      showViewAnimation: function(view) {
+      showViewAnimation: function(view, callback) {
         if (view == null) {
-          return;
+          return typeof callback === "function" ? callback(view) : void 0;
         }
         if ((view.showAnimation != null) && view !== this) {
-          return view.showAnimation();
+          return view.showAnimation(callback);
         } else {
-          return view.$el.show();
+          view.$el.show();
+          return typeof callback === "function" ? callback(view) : void 0;
         }
       },
-      closeViewAnimation: function(view) {
+      closeViewAnimation: function(view, callback) {
         if (view == null) {
-          return;
+          return typeof callback === "function" ? callback(view) : void 0;
         }
         if ((view.closeAnimation != null) && view !== this) {
-          return view.closeAnimation();
+          return view.closeAnimation(callback);
         } else {
-          return view.$el.hide();
+          view.$el.hide();
+          return typeof callback === "function" ? callback(view) : void 0;
         }
       },
       getViewDI: function(ViewClass, options) {

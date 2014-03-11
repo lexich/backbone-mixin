@@ -255,13 +255,8 @@ describe "Check show functionality:",->
 
     subview = new SubView
     @view.show subview
-
-    spyOn subview, "closeViewAnimation"
-    spyOn subview.test, "closeViewAnimation"
     expect(onShowCounter).toEqual 1
     @view.close @view
-    expect(subview.closeViewAnimation).toHaveBeenCalled()
-    expect(subview.test.closeViewAnimation).toHaveBeenCalled()
     expect(onCloseCounter).toEqual 1
 
     @view.show subview

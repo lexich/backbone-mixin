@@ -1,8 +1,8 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
-      version:"0.1.8"
-      # @overwrite default Backbone method Backbone.View.setElement      
+      version:"0.1.9"
+      # @overwrite default Backbone method Backbone.View.setElement
       setElement:->
         unless @_$_p?
           @_$_p =
@@ -12,13 +12,13 @@ MixinBackbone = (Backbone)->
             varbindUIElements:null
             var_bindings:null
         BaseClass::setElement.apply this, arguments
-        @$el.addClass @className if @className?          
+        @$el.addClass @className if @className?
         @reloadTemplate()
         @bindUIElements()
         @bindRegions()
         @bindUIEpoxy()
 
-      # @overwrite default Backbone method Backbone.View.remove   
+      # @overwrite default Backbone method Backbone.View.remove
       remove:->
         if @_$_p.removeFlag is true then return this else @_$_p.removeFlag = true
         BaseClass::remove.apply this, arguments
@@ -82,9 +82,10 @@ MixinBackbone = (Backbone)->
             this[k].showCurrent()
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.showCurrent()
-        @showAnimation()
-        this.trigger "onShow"
-        @onShow?()
+        @showAnimation (view)->
+          return unless view?
+          view.trigger "onShow"
+          view.onShow?()
 
       closeCurrent:->
         this.trigger "onBeforeClose"
@@ -94,9 +95,10 @@ MixinBackbone = (Backbone)->
             this[k].closeCurrent()
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.closeCurrent()
-        @closeAnimation()
-        this.trigger "onClose"
-        @onClose?()
+        @closeAnimation (view)->
+          return unless view?
+          view.trigger "onClose"
+          view.onClose?()
 
       close:(_view)->
         return unless _view?
@@ -106,27 +108,29 @@ MixinBackbone = (Backbone)->
         _view
 
       # Alias showViewAnimation(this)
-      showAnimation:->
-        @showViewAnimation this
+      showAnimation:(callback)->
+        @showViewAnimation this, callback
 
       # Alias closeViewAnimation(this)
-      closeAnimation:->
-        @closeViewAnimation this
+      closeAnimation:(callback)->
+        @closeViewAnimation this, callback
 
       # Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
-      showViewAnimation:(view)->
-        return unless view?
+      showViewAnimation:(view, callback)->
+        return callback?(view) unless view?
         if view.showAnimation? and view isnt this
-          view.showAnimation()
+          view.showAnimation callback
         else
           view.$el.show()
+          callback?(view)
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
-      closeViewAnimation:(view)->
-        return unless view?
+      closeViewAnimation:(view, callback)->
+        return callback?(view) unless view?
         if view.closeAnimation? and view isnt this
-          view.closeAnimation()
+          view.closeAnimation callback
         else
           view.$el.hide()
+          callback?(view)
 
       # Depedencies Injection functionality
       # `options` - options for `new View(options)`  operations
