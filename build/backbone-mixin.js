@@ -3,7 +3,7 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-      version: "0.2.0",
+      version: "0.2.1",
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -122,16 +122,15 @@ MixinBackbone = function(Backbone) {
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
           this._$_p.currentView.showCurrent();
         }
-        return this.showAnimation(function(view) {
-          if (view == null) {
-            return;
-          }
-          view.trigger("onShow");
-          if (typeof view.onShow === "function") {
-            view.onShow();
-          }
-          return typeof callback === "function" ? callback() : void 0;
-        });
+        return this.showAnimation((function(_this) {
+          return function() {
+            _this.trigger("onShow");
+            if (typeof _this.onShow === "function") {
+              _this.onShow();
+            }
+            return typeof callback === "function" ? callback() : void 0;
+          };
+        })(this));
       },
       closeCurrent: function(callback) {
         var k, regions, v;
@@ -148,16 +147,15 @@ MixinBackbone = function(Backbone) {
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
           this._$_p.currentView.closeCurrent();
         }
-        return this.closeAnimation(function(view) {
-          if (view == null) {
-            return;
-          }
-          view.trigger("onClose");
-          if (typeof view.onClose === "function") {
-            view.onClose();
-          }
-          return typeof callback === "function" ? callback() : void 0;
-        });
+        return this.closeAnimation((function(_this) {
+          return function() {
+            _this.trigger("onClose");
+            if (typeof _this.onClose === "function") {
+              _this.onClose();
+            }
+            return typeof callback === "function" ? callback() : void 0;
+          };
+        })(this));
       },
       close: function(_view, callback) {
         if (_view == null) {
@@ -178,24 +176,24 @@ MixinBackbone = function(Backbone) {
       },
       showViewAnimation: function(view, callback) {
         if (view == null) {
-          return typeof callback === "function" ? callback(view) : void 0;
+          return typeof callback === "function" ? callback() : void 0;
         }
         if ((view.showAnimation != null) && view !== this) {
           return view.showAnimation(callback);
         } else {
           view.$el.show();
-          return typeof callback === "function" ? callback(view) : void 0;
+          return typeof callback === "function" ? callback() : void 0;
         }
       },
       closeViewAnimation: function(view, callback) {
         if (view == null) {
-          return typeof callback === "function" ? callback(view) : void 0;
+          return typeof callback === "function" ? callback() : void 0;
         }
         if ((view.closeAnimation != null) && view !== this) {
           return view.closeAnimation(callback);
         } else {
           view.$el.hide();
-          return typeof callback === "function" ? callback(view) : void 0;
+          return typeof callback === "function" ? callback() : void 0;
         }
       },
       getViewDI: function(ViewClass, options) {

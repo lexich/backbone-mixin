@@ -1,7 +1,7 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
-      version:"0.2.0"
+      version:"0.2.1"
       # @overwrite default Backbone method Backbone.View.setElement
       setElement:->
         unless @_$_p?
@@ -82,10 +82,9 @@ MixinBackbone = (Backbone)->
             this[k].showCurrent()
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.showCurrent()
-        @showAnimation (view)->
-          return unless view?
-          view.trigger "onShow"
-          view.onShow?()
+        @showAnimation =>
+          @trigger "onShow"
+          @onShow?()
           callback?()
 
       closeCurrent:(callback)->
@@ -96,10 +95,9 @@ MixinBackbone = (Backbone)->
             this[k].closeCurrent()
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.closeCurrent()
-        @closeAnimation (view)->
-          return unless view?
-          view.trigger "onClose"
-          view.onClose?()
+        @closeAnimation =>          
+          @trigger "onClose"
+          @onClose?()
           callback?()
 
       close:(_view, callback)->
@@ -119,20 +117,20 @@ MixinBackbone = (Backbone)->
 
       # Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
       showViewAnimation:(view, callback)->
-        return callback?(view) unless view?
+        return callback?() unless view?
         if view.showAnimation? and view isnt this
           view.showAnimation callback
         else
           view.$el.show()
-          callback?(view)
+          callback?()
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view, callback)->
-        return callback?(view) unless view?
+        return callback?() unless view?
         if view.closeAnimation? and view isnt this
           view.closeAnimation callback
         else
           view.$el.hide()
-          callback?(view)
+          callback?()
 
       # Depedencies Injection functionality
       # `options` - options for `new View(options)`  operations
