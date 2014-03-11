@@ -1,7 +1,7 @@
 MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
-      version:"0.1.9"
+      version:"0.2.0"
       # @overwrite default Backbone method Backbone.View.setElement
       setElement:->
         unless @_$_p?
@@ -58,7 +58,7 @@ MixinBackbone = (Backbone)->
 
       _setCurrentView:(view)-> @_$_p.currentView = view
 
-      show:(_view, options = {})->
+      show:(_view, options = {},callback)->
         return unless _view?
         view = @getViewDI _view, options
         return view if view is @_$_p.currentView
@@ -67,10 +67,10 @@ MixinBackbone = (Backbone)->
         if this isnt view
           @_setCurrentView view
         @$el.append view.$el
-        view.showCurrent()
+        view.showCurrent callback
         view
 
-      showCurrent:->
+      showCurrent:(callback)->
         this.trigger "onBeforeShow"
         @onBeforeShow?()
         unless @_$_oneShow?
@@ -86,8 +86,9 @@ MixinBackbone = (Backbone)->
           return unless view?
           view.trigger "onShow"
           view.onShow?()
+          callback?()
 
-      closeCurrent:->
+      closeCurrent:(callback)->
         this.trigger "onBeforeClose"
         @onBeforeClose?()
         if(regions = _.result(this,"regions"))
@@ -99,12 +100,13 @@ MixinBackbone = (Backbone)->
           return unless view?
           view.trigger "onClose"
           view.onClose?()
+          callback?()
 
-      close:(_view)->
+      close:(_view, callback)->
         return unless _view?
         @close @_$_p.currentView  if @_$_p.currentView? and @_$_p.currentView isnt _view
         @_setCurrentView null
-        _view.closeCurrent()
+        _view.closeCurrent callback
         _view
 
       # Alias showViewAnimation(this)

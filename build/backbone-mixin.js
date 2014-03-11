@@ -3,7 +3,7 @@ var MixinBackbone;
 MixinBackbone = function(Backbone) {
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-      version: "0.1.9",
+      version: "0.2.0",
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -79,7 +79,7 @@ MixinBackbone = function(Backbone) {
       _setCurrentView: function(view) {
         return this._$_p.currentView = view;
       },
-      show: function(_view, options) {
+      show: function(_view, options, callback) {
         var view;
         if (options == null) {
           options = {};
@@ -99,10 +99,10 @@ MixinBackbone = function(Backbone) {
           this._setCurrentView(view);
         }
         this.$el.append(view.$el);
-        view.showCurrent();
+        view.showCurrent(callback);
         return view;
       },
-      showCurrent: function() {
+      showCurrent: function(callback) {
         var k, regions, v;
         this.trigger("onBeforeShow");
         if (typeof this.onBeforeShow === "function") {
@@ -127,10 +127,13 @@ MixinBackbone = function(Backbone) {
             return;
           }
           view.trigger("onShow");
-          return typeof view.onShow === "function" ? view.onShow() : void 0;
+          if (typeof view.onShow === "function") {
+            view.onShow();
+          }
+          return typeof callback === "function" ? callback() : void 0;
         });
       },
-      closeCurrent: function() {
+      closeCurrent: function(callback) {
         var k, regions, v;
         this.trigger("onBeforeClose");
         if (typeof this.onBeforeClose === "function") {
@@ -150,10 +153,13 @@ MixinBackbone = function(Backbone) {
             return;
           }
           view.trigger("onClose");
-          return typeof view.onClose === "function" ? view.onClose() : void 0;
+          if (typeof view.onClose === "function") {
+            view.onClose();
+          }
+          return typeof callback === "function" ? callback() : void 0;
         });
       },
-      close: function(_view) {
+      close: function(_view, callback) {
         if (_view == null) {
           return;
         }
@@ -161,7 +167,7 @@ MixinBackbone = function(Backbone) {
           this.close(this._$_p.currentView);
         }
         this._setCurrentView(null);
-        _view.closeCurrent();
+        _view.closeCurrent(callback);
         return _view;
       },
       showAnimation: function(callback) {
