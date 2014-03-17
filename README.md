@@ -144,3 +144,7 @@ bower install
 grunt karma:dist
 ```
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lexich/backbone-mixin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
