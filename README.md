@@ -1,4 +1,4 @@
-[docs](https://lexich.github.io/backbone-mixin/backbone-mixin.html)
+[docs](https://lexich.github.io/backbone-mixin/)
 
 [![Build Status](https://travis-ci.org/lexich/backbone-mixin.png?branch=master)](https://travis-ci.org/lexich/backbone-mixin)
 # Description

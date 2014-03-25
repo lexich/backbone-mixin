@@ -1,11 +1,12 @@
 MixinBackbone = (Backbone)->
-  version = "0.2.2"
+  MixinBackbone.version = "0.2.3"
   MixinBackbone = (BaseClass)->
     BaseClass.extend      
-      ###
+      #
       # @lang=en overwrite default Backbone method Backbone.View.setElement
+      #
       # @lang=ru Перегрузка стандартного метода Backbone.View.setElement
-      ###
+      #
       setElement:->
         unless @_$_p?
           @_$_p =
@@ -20,10 +21,11 @@ MixinBackbone = (Backbone)->
         @bindUIElements()
         @bindRegions()
         @bindUIEpoxy()
-      ###
+      #
       # @lang=en overwrite default Backbone method Backbone.View.remove
+      #
       # @lang=ru Перегрузка стандартного метода Backbone.View.remove
-      ###
+      #
       remove:->
         if @_$_p.removeFlag is true then return this else @_$_p.removeFlag = true
         BaseClass::remove.apply this, arguments
@@ -31,10 +33,11 @@ MixinBackbone = (Backbone)->
         @unbindUIElements()
         view.remove() for k,view of @_$_p.diViews
         @_$_p.diViews = {}
-      ###
+      #
       # @lang=en overwrite default Backbone method Backbone.View.delegateEvents
+      #
       # @lang=ru Перегрузка стандартного метода Backbone.View.delegateEvents
-      ###
+      #
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
         if @_$_p.varbindUIElements? and events?
@@ -48,47 +51,62 @@ MixinBackbone = (Backbone)->
             memo
           ),{}
         BaseClass::delegateEvents?.call this, events
-      ###
+      #
       # @lang=en Get keys of all DI views
+      #
       # @lang=ru Получение всех ключей из DI-кэша
-      ###
+      #
       _diViewsKeys:-> _.keys(@_$_p.diViews)
 
-      ###
+      #
       # @lang=en Get all DI views
+      #
       # @lang=ru Получение всех значений из DI-кэша
-      ###
+      #
       _diViewsValues:-> _.values(@_$_p.diViews)
 
-      ###
+      #
       # @lang=en `show` mechanizm call `view.render` function only while first calling. 
       # `setNeedRerenderView` forse call `view.render` function once again
+      #
       # @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)` 
       # повторно вызвать метод `render`      
-      ###
+      #
       setNeedRerenderView:(view)->
         view._$_oneShow = null
 
-      ###
+      #
       # @lang=en Alias setNeedRerenderView(this)
+      #
       # @lang=ru Псевдоним конструкции
-      ###
+      #
       setNeedRerender:->
         @setNeedRerenderView this
 
-      _setCurrentView:(view)-> @_$_p.currentView = view
+      #
+      # @lang=en private method to set current open view
+      #
+      # @lang=ru приватный метод для установки текущей открытой view
+      #
+      _setCurrentView:(view)-> 
+        @_$_p.currentView = view
 
       show:(_view, options = {},callback)->
         return unless _view?
         view = @getViewDI _view, options
         return view if view is @_$_p.currentView
-        @close @_$_p.currentView if @_$_p.currentView? and this isnt @_$_p.currentView
-        @_setCurrentView null
-        if this isnt view
-          @_setCurrentView view
-        @$el.append view.$el
-        view.showCurrent callback
-        view
+        __show = do(view=view,callback=callback)=> =>
+          @_setCurrentView null
+          if this isnt view
+            @_setCurrentView view
+          @$el.append view.$el
+          view.showCurrent callback
+          view
+
+        if @_$_p.currentView? and this isnt @_$_p.currentView
+          @close @_$_p.currentView, __show
+        else
+          __show()
 
       showCurrent:(callback)->
         this.trigger "onBeforeShow"
@@ -97,28 +115,49 @@ MixinBackbone = (Backbone)->
           @_$_oneShow = true
           this.trigger "render"
           @render()
+
+        finish = do(callback=callback, times=3)->       #--finish 3 times
+          _.after times, ->callback?()
+
         if(regions = _.result(this,"regions"))
-          for k,v of regions
-            this[k].showCurrent()
+          keys = _.keys(regions)
+          _callback = _.after _.size(keys), finish      #->finish 1
+          this[k].showCurrent _callback for k in keys
+        else
+          finish()                                      #->finish 1
+            
         if @_$_p.currentView? and @_$_p.currentView isnt this
-          @_$_p.currentView.showCurrent()
+          @_$_p.currentView.showCurrent finish          #->finish 2
+        else
+          finish()                                      #->finish 2
+
         @showAnimation =>
           @trigger "onShow"
           @onShow?()
-          callback?()
+          finish()                                      #->finish 3
 
       closeCurrent:(callback)->
         this.trigger "onBeforeClose"
         @onBeforeClose?()
+        finish = do(callback=callback, times=3)->       #--finish 3 times
+          _.after times, -> callback?()   
+
         if(regions = _.result(this,"regions"))
-          for k,v of regions
-            this[k].closeCurrent()
+          keys = _.keys(regions)
+          _callback = _.after _.size(keys), finish      #->finish 1
+          this[k].closeCurrent _callback for k in keys
+        else
+          finish()                                      #->finish 1
+            
         if @_$_p.currentView? and @_$_p.currentView isnt this
-          @_$_p.currentView.closeCurrent()
-        @closeAnimation =>          
+          @_$_p.currentView.closeCurrent finish         #->finish 2
+        else
+          finish()                                      #->finish 2
+        
+        @closeAnimation =>
           @trigger "onClose"
           @onClose?()
-          callback?()
+          finish()                                      #->finish 3
 
       close:(_view, callback)->
         return unless _view?
@@ -143,6 +182,7 @@ MixinBackbone = (Backbone)->
         else
           view.$el.show()
           callback?()
+      
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view, callback)->
         return callback?() unless view?

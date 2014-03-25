@@ -40,6 +40,12 @@ module.exports = function(grunt) {
         dest: "."
       }
     },
+    rename:{
+      docs:{
+        src:"docs/backbone-mixin.html",
+        dest:"docs/index.html"
+      }      
+    },    
     git_deploy:{
       dist:{
         options:{
@@ -80,6 +86,7 @@ module.exports = function(grunt) {
   ]);
   grunt.registerTask('docs', [
     'docco:dist',
+    'rename:docs',
     'git_deploy:dist'    
   ]);
 
@@ -94,4 +101,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-version');
   grunt.loadNpmTasks('grunt-git-deploy');
+  grunt.loadNpmTasks('grunt-rename');
 };

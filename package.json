@@ -1,6 +1,6 @@
 {
   "name": "backbone-mixin",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "grunt-karma": "~0.6.2",
     "grunt-docco": "~0.3.3",
     "grunt-version": "~0.3.0",
-    "grunt-git-deploy": "~0.1.1"
+    "grunt-git-deploy": "~0.1.1",
+    "grunt-rename": "~0.1.3"
   }
 }

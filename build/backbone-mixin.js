@@ -1,15 +1,9 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  var version;
-  version = "0.2.2";
+  MixinBackbone.version = "0.2.3";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-
-      /*
-       * @lang=en overwrite default Backbone method Backbone.View.setElement
-       * @lang=ru Перегрузка стандартного метода Backbone.View.setElement
-       */
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -29,11 +23,6 @@ MixinBackbone = function(Backbone) {
         this.bindRegions();
         return this.bindUIEpoxy();
       },
-
-      /*
-       * @lang=en overwrite default Backbone method Backbone.View.remove
-       * @lang=ru Перегрузка стандартного метода Backbone.View.remove
-       */
       remove: function() {
         var k, view, _ref;
         if (this._$_p.removeFlag === true) {
@@ -51,11 +40,6 @@ MixinBackbone = function(Backbone) {
         }
         return this._$_p.diViews = {};
       },
-
-      /*
-       * @lang=en overwrite default Backbone method Backbone.View.delegateEvents
-       * @lang=ru Перегрузка стандартного метода Backbone.View.delegateEvents
-       */
       delegateEvents: function(events) {
         var _ref;
         events || (events = _.result(this, 'events'));
@@ -80,37 +64,15 @@ MixinBackbone = function(Backbone) {
         }
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
       },
-
-      /*
-       * @lang=en Get keys of all DI views
-       * @lang=ru Получение всех ключей из DI-кэша
-       */
       _diViewsKeys: function() {
         return _.keys(this._$_p.diViews);
       },
-
-      /*
-       * @lang=en Get all DI views
-       * @lang=ru Получение всех значений из DI-кэша
-       */
       _diViewsValues: function() {
         return _.values(this._$_p.diViews);
       },
-
-      /*
-       * @lang=en `show` mechanizm call `view.render` function only while first calling. 
-       * `setNeedRerenderView` forse call `view.render` function once again
-       * @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)` 
-       * повторно вызвать метод `render`
-       */
       setNeedRerenderView: function(view) {
         return view._$_oneShow = null;
       },
-
-      /*
-       * @lang=en Alias setNeedRerenderView(this)
-       * @lang=ru Псевдоним конструкции
-       */
       setNeedRerender: function() {
         return this.setNeedRerenderView(this);
       },
@@ -118,7 +80,7 @@ MixinBackbone = function(Backbone) {
         return this._$_p.currentView = view;
       },
       show: function(_view, options, callback) {
-        var view;
+        var view, __show;
         if (options == null) {
           options = {};
         }
@@ -129,19 +91,27 @@ MixinBackbone = function(Backbone) {
         if (view === this._$_p.currentView) {
           return view;
         }
+        __show = (function(_this) {
+          return function(view, callback) {
+            return function() {
+              _this._setCurrentView(null);
+              if (_this !== view) {
+                _this._setCurrentView(view);
+              }
+              _this.$el.append(view.$el);
+              view.showCurrent(callback);
+              return view;
+            };
+          };
+        })(this)(view, callback);
         if ((this._$_p.currentView != null) && this !== this._$_p.currentView) {
-          this.close(this._$_p.currentView);
+          return this.close(this._$_p.currentView, __show);
+        } else {
+          return __show();
         }
-        this._setCurrentView(null);
-        if (this !== view) {
-          this._setCurrentView(view);
-        }
-        this.$el.append(view.$el);
-        view.showCurrent(callback);
-        return view;
       },
       showCurrent: function(callback) {
-        var k, regions, v;
+        var finish, k, keys, regions, _callback, _i, _len;
         this.trigger("onBeforeShow");
         if (typeof this.onBeforeShow === "function") {
           this.onBeforeShow();
@@ -151,14 +121,25 @@ MixinBackbone = function(Backbone) {
           this.trigger("render");
           this.render();
         }
+        finish = (function(callback, times) {
+          return _.after(times, function() {
+            return typeof callback === "function" ? callback() : void 0;
+          });
+        })(callback, 3);
         if ((regions = _.result(this, "regions"))) {
-          for (k in regions) {
-            v = regions[k];
-            this[k].showCurrent();
+          keys = _.keys(regions);
+          _callback = _.after(_.size(keys), finish);
+          for (_i = 0, _len = keys.length; _i < _len; _i++) {
+            k = keys[_i];
+            this[k].showCurrent(_callback);
           }
+        } else {
+          finish();
         }
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
-          this._$_p.currentView.showCurrent();
+          this._$_p.currentView.showCurrent(finish);
+        } else {
+          finish();
         }
         return this.showAnimation((function(_this) {
           return function() {
@@ -166,24 +147,35 @@ MixinBackbone = function(Backbone) {
             if (typeof _this.onShow === "function") {
               _this.onShow();
             }
-            return typeof callback === "function" ? callback() : void 0;
+            return finish();
           };
         })(this));
       },
       closeCurrent: function(callback) {
-        var k, regions, v;
+        var finish, k, keys, regions, _callback, _i, _len;
         this.trigger("onBeforeClose");
         if (typeof this.onBeforeClose === "function") {
           this.onBeforeClose();
         }
+        finish = (function(callback, times) {
+          return _.after(times, function() {
+            return typeof callback === "function" ? callback() : void 0;
+          });
+        })(callback, 3);
         if ((regions = _.result(this, "regions"))) {
-          for (k in regions) {
-            v = regions[k];
-            this[k].closeCurrent();
+          keys = _.keys(regions);
+          _callback = _.after(_.size(keys), finish);
+          for (_i = 0, _len = keys.length; _i < _len; _i++) {
+            k = keys[_i];
+            this[k].closeCurrent(_callback);
           }
+        } else {
+          finish();
         }
         if ((this._$_p.currentView != null) && this._$_p.currentView !== this) {
-          this._$_p.currentView.closeCurrent();
+          this._$_p.currentView.closeCurrent(finish);
+        } else {
+          finish();
         }
         return this.closeAnimation((function(_this) {
           return function() {
@@ -191,7 +183,7 @@ MixinBackbone = function(Backbone) {
             if (typeof _this.onClose === "function") {
               _this.onClose();
             }
-            return typeof callback === "function" ? callback() : void 0;
+            return finish();
           };
         })(this));
       },
