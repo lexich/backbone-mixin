@@ -1,9 +1,15 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
+  var version;
+  version = "0.2.2";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
-      version: "0.2.1",
+
+      /*
+       * @lang=en overwrite default Backbone method Backbone.View.setElement
+       * @lang=ru Перегрузка стандартного метода Backbone.View.setElement
+       */
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -23,6 +29,11 @@ MixinBackbone = function(Backbone) {
         this.bindRegions();
         return this.bindUIEpoxy();
       },
+
+      /*
+       * @lang=en overwrite default Backbone method Backbone.View.remove
+       * @lang=ru Перегрузка стандартного метода Backbone.View.remove
+       */
       remove: function() {
         var k, view, _ref;
         if (this._$_p.removeFlag === true) {
@@ -40,6 +51,11 @@ MixinBackbone = function(Backbone) {
         }
         return this._$_p.diViews = {};
       },
+
+      /*
+       * @lang=en overwrite default Backbone method Backbone.View.delegateEvents
+       * @lang=ru Перегрузка стандартного метода Backbone.View.delegateEvents
+       */
       delegateEvents: function(events) {
         var _ref;
         events || (events = _.result(this, 'events'));
@@ -64,15 +80,37 @@ MixinBackbone = function(Backbone) {
         }
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
       },
+
+      /*
+       * @lang=en Get keys of all DI views
+       * @lang=ru Получение всех ключей из DI-кэша
+       */
       _diViewsKeys: function() {
         return _.keys(this._$_p.diViews);
       },
+
+      /*
+       * @lang=en Get all DI views
+       * @lang=ru Получение всех значений из DI-кэша
+       */
       _diViewsValues: function() {
         return _.values(this._$_p.diViews);
       },
+
+      /*
+       * @lang=en `show` mechanizm call `view.render` function only while first calling. 
+       * `setNeedRerenderView` forse call `view.render` function once again
+       * @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)` 
+       * повторно вызвать метод `render`
+       */
       setNeedRerenderView: function(view) {
         return view._$_oneShow = null;
       },
+
+      /*
+       * @lang=en Alias setNeedRerenderView(this)
+       * @lang=ru Псевдоним конструкции
+       */
       setNeedRerender: function() {
         return this.setNeedRerenderView(this);
       },

@@ -1,8 +1,11 @@
 MixinBackbone = (Backbone)->
+  version = "0.2.2"
   MixinBackbone = (BaseClass)->
-    BaseClass.extend
-      version:"0.2.1"
-      # @overwrite default Backbone method Backbone.View.setElement
+    BaseClass.extend      
+      ###
+      # @lang=en overwrite default Backbone method Backbone.View.setElement
+      # @lang=ru Перегрузка стандартного метода Backbone.View.setElement
+      ###
       setElement:->
         unless @_$_p?
           @_$_p =
@@ -17,8 +20,10 @@ MixinBackbone = (Backbone)->
         @bindUIElements()
         @bindRegions()
         @bindUIEpoxy()
-
-      # @overwrite default Backbone method Backbone.View.remove
+      ###
+      # @lang=en overwrite default Backbone method Backbone.View.remove
+      # @lang=ru Перегрузка стандартного метода Backbone.View.remove
+      ###
       remove:->
         if @_$_p.removeFlag is true then return this else @_$_p.removeFlag = true
         BaseClass::remove.apply this, arguments
@@ -26,8 +31,10 @@ MixinBackbone = (Backbone)->
         @unbindUIElements()
         view.remove() for k,view of @_$_p.diViews
         @_$_p.diViews = {}
-
-      # @overwrite default Backbone method Backbone.View.delegateEvents
+      ###
+      # @lang=en overwrite default Backbone method Backbone.View.delegateEvents
+      # @lang=ru Перегрузка стандартного метода Backbone.View.delegateEvents
+      ###
       delegateEvents:(events)->
         events or (events = _.result(this,'events'))
         if @_$_p.varbindUIElements? and events?
@@ -41,18 +48,31 @@ MixinBackbone = (Backbone)->
             memo
           ),{}
         BaseClass::delegateEvents?.call this, events
-
-      # Get keys of all DI views
+      ###
+      # @lang=en Get keys of all DI views
+      # @lang=ru Получение всех ключей из DI-кэша
+      ###
       _diViewsKeys:-> _.keys(@_$_p.diViews)
 
-      # Get all DI views
+      ###
+      # @lang=en Get all DI views
+      # @lang=ru Получение всех значений из DI-кэша
+      ###
       _diViewsValues:-> _.values(@_$_p.diViews)
 
-      # `show` mechanizm call `view.render` function only while first calling. `setNeedRerenderView` forse call `view.render` function once again
+      ###
+      # @lang=en `show` mechanizm call `view.render` function only while first calling. 
+      # `setNeedRerenderView` forse call `view.render` function once again
+      # @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)` 
+      # повторно вызвать метод `render`      
+      ###
       setNeedRerenderView:(view)->
         view._$_oneShow = null
 
-      # Alias setNeedRerenderView(this)
+      ###
+      # @lang=en Alias setNeedRerenderView(this)
+      # @lang=ru Псевдоним конструкции
+      ###
       setNeedRerender:->
         @setNeedRerenderView this
 
