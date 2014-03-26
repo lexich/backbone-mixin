@@ -1,7 +1,7 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.3"
+  MixinBackbone.version = "0.2.4"
   MixinBackbone = (BaseClass)->
-    BaseClass.extend      
+    BaseClass.extend
       #
       # @lang=en overwrite default Backbone method Backbone.View.setElement
       #
@@ -66,11 +66,11 @@ MixinBackbone = (Backbone)->
       _diViewsValues:-> _.values(@_$_p.diViews)
 
       #
-      # @lang=en `show` mechanizm call `view.render` function only while first calling. 
+      # @lang=en `show` mechanizm call `view.render` function only while first calling.
       # `setNeedRerenderView` forse call `view.render` function once again
       #
-      # @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)` 
-      # повторно вызвать метод `render`      
+      # @lang=ru Метод устанавливает флаг, который позволяет при вызове `show(view)`
+      # повторно вызвать метод `render`
       #
       setNeedRerenderView:(view)->
         view._$_oneShow = null
@@ -88,20 +88,20 @@ MixinBackbone = (Backbone)->
       #
       # @lang=ru приватный метод для установки текущей открытой view
       #
-      _setCurrentView:(view)-> 
+      _setCurrentView:(view)->
         @_$_p.currentView = view
 
       show:(_view, options = {},callback)->
         return unless _view?
         view = @getViewDI _view, options
         return view if view is @_$_p.currentView
-        __show = do(view=view,callback=callback)=> =>
-          @_setCurrentView null
-          if this isnt view
-            @_setCurrentView view
-          @$el.append view.$el
-          view.showCurrent callback
-          view
+        __show = =>
+            @_setCurrentView null
+            if this isnt view
+              @_setCurrentView view
+            @$el.append view.$el
+            view.showCurrent callback
+            view
 
         if @_$_p.currentView? and this isnt @_$_p.currentView
           @close @_$_p.currentView, __show
@@ -116,8 +116,7 @@ MixinBackbone = (Backbone)->
           this.trigger "render"
           @render()
 
-        finish = do(callback=callback, times=3)->       #--finish 3 times
-          _.after times, ->callback?()
+        finish = _.after 3, => callback?()              #--finish 3 times
 
         if(regions = _.result(this,"regions"))
           keys = _.keys(regions)
@@ -125,7 +124,7 @@ MixinBackbone = (Backbone)->
           this[k].showCurrent _callback for k in keys
         else
           finish()                                      #->finish 1
-            
+
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.showCurrent finish          #->finish 2
         else
@@ -139,8 +138,7 @@ MixinBackbone = (Backbone)->
       closeCurrent:(callback)->
         this.trigger "onBeforeClose"
         @onBeforeClose?()
-        finish = do(callback=callback, times=3)->       #--finish 3 times
-          _.after times, -> callback?()   
+        finish = _.after 3, =>  callback?()             #--finish 3 times
 
         if(regions = _.result(this,"regions"))
           keys = _.keys(regions)
@@ -148,12 +146,12 @@ MixinBackbone = (Backbone)->
           this[k].closeCurrent _callback for k in keys
         else
           finish()                                      #->finish 1
-            
+
         if @_$_p.currentView? and @_$_p.currentView isnt this
           @_$_p.currentView.closeCurrent finish         #->finish 2
         else
           finish()                                      #->finish 2
-        
+
         @closeAnimation =>
           @trigger "onClose"
           @onClose?()
@@ -161,9 +159,14 @@ MixinBackbone = (Backbone)->
 
       close:(_view, callback)->
         return unless _view?
-        @close @_$_p.currentView  if @_$_p.currentView? and @_$_p.currentView isnt _view
+        finish = _.after 2, => callback?()              #--finish 3 times
+        if @_$_p.currentView? and @_$_p.currentView isnt _view
+          @close @_$_p.currentView, finish
+        else
+          finish()
+
         @_setCurrentView null
-        _view.closeCurrent callback
+        _view.closeCurrent finish
         _view
 
       # Alias showViewAnimation(this)
@@ -182,7 +185,7 @@ MixinBackbone = (Backbone)->
         else
           view.$el.show()
           callback?()
-      
+
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view, callback)->
         return callback?() unless view?

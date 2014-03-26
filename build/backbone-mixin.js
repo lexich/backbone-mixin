@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.3";
+  MixinBackbone.version = "0.2.4";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -92,18 +92,16 @@ MixinBackbone = function(Backbone) {
           return view;
         }
         __show = (function(_this) {
-          return function(view, callback) {
-            return function() {
-              _this._setCurrentView(null);
-              if (_this !== view) {
-                _this._setCurrentView(view);
-              }
-              _this.$el.append(view.$el);
-              view.showCurrent(callback);
-              return view;
-            };
+          return function() {
+            _this._setCurrentView(null);
+            if (_this !== view) {
+              _this._setCurrentView(view);
+            }
+            _this.$el.append(view.$el);
+            view.showCurrent(callback);
+            return view;
           };
-        })(this)(view, callback);
+        })(this);
         if ((this._$_p.currentView != null) && this !== this._$_p.currentView) {
           return this.close(this._$_p.currentView, __show);
         } else {
@@ -121,11 +119,11 @@ MixinBackbone = function(Backbone) {
           this.trigger("render");
           this.render();
         }
-        finish = (function(callback, times) {
-          return _.after(times, function() {
+        finish = _.after(3, (function(_this) {
+          return function() {
             return typeof callback === "function" ? callback() : void 0;
-          });
-        })(callback, 3);
+          };
+        })(this));
         if ((regions = _.result(this, "regions"))) {
           keys = _.keys(regions);
           _callback = _.after(_.size(keys), finish);
@@ -157,11 +155,11 @@ MixinBackbone = function(Backbone) {
         if (typeof this.onBeforeClose === "function") {
           this.onBeforeClose();
         }
-        finish = (function(callback, times) {
-          return _.after(times, function() {
+        finish = _.after(3, (function(_this) {
+          return function() {
             return typeof callback === "function" ? callback() : void 0;
-          });
-        })(callback, 3);
+          };
+        })(this));
         if ((regions = _.result(this, "regions"))) {
           keys = _.keys(regions);
           _callback = _.after(_.size(keys), finish);
@@ -188,14 +186,22 @@ MixinBackbone = function(Backbone) {
         })(this));
       },
       close: function(_view, callback) {
+        var finish;
         if (_view == null) {
           return;
         }
+        finish = _.after(2, (function(_this) {
+          return function() {
+            return typeof callback === "function" ? callback() : void 0;
+          };
+        })(this));
         if ((this._$_p.currentView != null) && this._$_p.currentView !== _view) {
-          this.close(this._$_p.currentView);
+          this.close(this._$_p.currentView, finish);
+        } else {
+          finish();
         }
         this._setCurrentView(null);
-        _view.closeCurrent(callback);
+        _view.closeCurrent(finish);
         return _view;
       },
       showAnimation: function(callback) {
