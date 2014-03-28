@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.6"
+  MixinBackbone.version = "0.2.7"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       #
@@ -59,7 +59,7 @@ MixinBackbone = (Backbone)->
       # на измение значения name и сразу же вызвать callback для текущего значения
       #
       listenToValue:(obj, name, callback) ->
-        obj.on name, callback, this
+        obj.on "change:#{name}", callback, this
         setTimeout (=>
           callback.call this, obj, obj.get(name)
         ), 0

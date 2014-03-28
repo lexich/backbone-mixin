@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.6";
+  MixinBackbone.version = "0.2.7";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -65,7 +65,7 @@ MixinBackbone = function(Backbone) {
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
       },
       listenToValue: function(obj, name, callback) {
-        obj.on(name, callback, this);
+        obj.on("change:" + name, callback, this);
         return setTimeout(((function(_this) {
           return function() {
             return callback.call(_this, obj, obj.get(name));
