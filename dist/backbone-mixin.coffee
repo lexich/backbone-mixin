@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.4"
+  MixinBackbone.version = "0.2.6"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       #
@@ -51,6 +51,18 @@ MixinBackbone = (Backbone)->
             memo
           ),{}
         BaseClass::delegateEvents?.call this, events
+      #
+      # @lang=en Helper helps listen obj for name change
+      # and callback for current value
+      #
+      # @lang=ru Хелпер позволяет повесить слушателя на obj 
+      # на измение значения name и сразу же вызвать callback для текущего значения
+      #
+      listenToValue:(obj, name, callback) ->
+        obj.on name, callback, this
+        setTimeout (=>
+          callback.call this, obj, obj.get(name)
+        ), 0
       #
       # @lang=en Get keys of all DI views
       #

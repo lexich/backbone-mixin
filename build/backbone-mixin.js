@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.4";
+  MixinBackbone.version = "0.2.6";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -63,6 +63,14 @@ MixinBackbone = function(Backbone) {
           })(this)), {});
         }
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
+      },
+      listenToValue: function(obj, name, callback) {
+        obj.on(name, callback, this);
+        return setTimeout(((function(_this) {
+          return function() {
+            return callback.call(_this, obj, obj.get(name));
+          };
+        })(this)), 0);
       },
       _diViewsKeys: function() {
         return _.keys(this._$_p.diViews);
