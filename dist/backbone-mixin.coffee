@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.7"
+  MixinBackbone.version = "0.2.8"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       #
@@ -119,6 +119,7 @@ MixinBackbone = (Backbone)->
           @close @_$_p.currentView, __show
         else
           __show()
+        view
 
       showCurrent:(callback)->
         this.trigger "onBeforeShow"

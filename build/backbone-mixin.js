@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.7";
+  MixinBackbone.version = "0.2.8";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -111,10 +111,11 @@ MixinBackbone = function(Backbone) {
           };
         })(this);
         if ((this._$_p.currentView != null) && this !== this._$_p.currentView) {
-          return this.close(this._$_p.currentView, __show);
+          this.close(this._$_p.currentView, __show);
         } else {
-          return __show();
+          __show();
         }
+        return view;
       },
       showCurrent: function(callback) {
         var finish, k, keys, regions, _callback, _i, _len;
