@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.8"
+  MixinBackbone.version = "0.2.9"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       #
@@ -104,9 +104,13 @@ MixinBackbone = (Backbone)->
         @_$_p.currentView = view
 
       show:(_view, options = {},callback)->
-        return unless _view?
+        unless _view?
+          callback?()
+          return
         view = @getViewDI _view, options
-        return view if view is @_$_p.currentView
+        if view is @_$_p.currentView
+          callback?()
+          return view
         __show = =>
             @_setCurrentView null
             if this isnt view
@@ -171,7 +175,9 @@ MixinBackbone = (Backbone)->
           finish()                                      #->finish 3
 
       close:(_view, callback)->
-        return unless _view?
+        unless _view?
+          callback?()
+          return
         finish = _.after 2, => callback?()              #--finish 3 times
         if @_$_p.currentView? and @_$_p.currentView isnt _view
           @close @_$_p.currentView, finish
@@ -192,7 +198,9 @@ MixinBackbone = (Backbone)->
 
       # Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
       showViewAnimation:(view, callback)->
-        return callback?() unless view?
+        unless view?
+          callback?()
+          return
         if view.showAnimation? and view isnt this
           view.showAnimation callback
         else
@@ -201,7 +209,9 @@ MixinBackbone = (Backbone)->
 
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view, callback)->
-        return callback?() unless view?
+        unless view?
+          callback?()
+          return
         if view.closeAnimation? and view isnt this
           view.closeAnimation callback
         else

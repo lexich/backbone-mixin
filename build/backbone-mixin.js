@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.8";
+  MixinBackbone.version = "0.2.9";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -93,10 +93,16 @@ MixinBackbone = function(Backbone) {
           options = {};
         }
         if (_view == null) {
+          if (typeof callback === "function") {
+            callback();
+          }
           return;
         }
         view = this.getViewDI(_view, options);
         if (view === this._$_p.currentView) {
+          if (typeof callback === "function") {
+            callback();
+          }
           return view;
         }
         __show = (function(_this) {
@@ -197,6 +203,9 @@ MixinBackbone = function(Backbone) {
       close: function(_view, callback) {
         var finish;
         if (_view == null) {
+          if (typeof callback === "function") {
+            callback();
+          }
           return;
         }
         finish = _.after(2, (function(_this) {
@@ -221,7 +230,10 @@ MixinBackbone = function(Backbone) {
       },
       showViewAnimation: function(view, callback) {
         if (view == null) {
-          return typeof callback === "function" ? callback() : void 0;
+          if (typeof callback === "function") {
+            callback();
+          }
+          return;
         }
         if ((view.showAnimation != null) && view !== this) {
           return view.showAnimation(callback);
@@ -232,7 +244,10 @@ MixinBackbone = function(Backbone) {
       },
       closeViewAnimation: function(view, callback) {
         if (view == null) {
-          return typeof callback === "function" ? callback() : void 0;
+          if (typeof callback === "function") {
+            callback();
+          }
+          return;
         }
         if ((view.closeAnimation != null) && view !== this) {
           return view.closeAnimation(callback);
