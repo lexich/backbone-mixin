@@ -61,7 +61,7 @@ MixinBackbone = (Backbone)->
       listenToValue:(obj, name, callback) ->
         obj.on "change:#{name}", callback, this
         setTimeout (=>
-          callback.call this, obj, obj.get(name)
+          callback.call this, obj, obj.get(name),{}
         ), 0
       #
       # @lang=en Get keys of all DI views
