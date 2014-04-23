@@ -20,6 +20,21 @@ describe "Check show functionality:",->
     expect(@subview.showAnimation).toHaveBeenCalled()
     expect(@subview.render).toHaveBeenCalled()
 
+  it 'check double call the same view',->
+    finish_counter = 0
+    onShow = 0
+    @subview.on "onShow",-> onShow += 1
+
+    @view.show @subview,{},->
+      finish_counter+= 1
+    expect(1).toBe finish_counter
+    expect(1).toBe onShow
+
+    @view.show @subview,{},->
+      finish_counter+= 1
+    expect(2).toBe finish_counter
+    expect(1).toBe onShow
+
   it "check not call close -> open for reopen view",->
     spyOn @subview, "closeCurrent"
     @view.show @subview

@@ -38,3 +38,13 @@ describe "Check MixinBackbone DI",->
     view1 = @view.getViewDI type:@TestViewDI, key:"1"
     view2 = @view.getViewDI type:@TestViewDI, key:"2"
     expect(view1).not.toEqual view2
+
+  it "check keys & values",->
+    view1 = @view.getViewDI @TestViewDI
+    keys = @view._diViewsKeys()
+    values = @view._diViewsValues()
+    expect(1).toBe _.size(keys)
+    expect(@TestViewDI::_$_di).toBe keys[0]
+    expect(1).toBe _.size(values)
+    expect(view1).toBe values[0]
+
