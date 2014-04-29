@@ -6,7 +6,7 @@ describe "Check MixinBackbone bindRegions", ->
     view = new TestView()
     expect(!!view.regions).toBeTruthy()
     view.remove()
-    expect(!view.test).toBeTruthy()
+    expect(!view.r.test).toBeTruthy()
   it "check custom regions with selector",->
     RegionView = do(SuperClass = MixinBackbone(Backbone.View) )->
       SuperClass.extend
@@ -21,11 +21,11 @@ describe "Check MixinBackbone bindRegions", ->
 
     view = new TestView
     expect(!!view.regions).toBeTruthy()
-    expect(!!view.test).toBeTruthy()
-    expect(!!view.test.custom_region).toBeTruthy()
-    test = view.test
+    expect(!!view.r.test).toBeTruthy()
+    expect(!!view.r.test.custom_region).toBeTruthy()
+    test = view.r.test
     view.remove()
-    expect(!view.test).toBeTruthy()
+    expect(!view.r.test).toBeTruthy()
     expect(!!test.remove_custom_view).toBeTruthy()
 
 
@@ -36,7 +36,7 @@ describe "Check MixinBackbone bindRegions", ->
       regions:
         test: el:$el, view:RegionView
     view = new TestView()
-    expect(view.test.$el).toEqual($el)
+    expect(view.r.test.$el).toEqual($el)
     view.remove()
 
 describe "Check MixinBackbone bindUIElements",->
@@ -274,10 +274,10 @@ describe "Check show functionality:",->
 
     subview = new SubView
     spyOn subview, "render"
-    spyOn subview.test, "render"
+    spyOn subview.r.test, "render"
     @view.show subview
     expect(subview.render).toHaveBeenCalled()
-    expect(subview.test.render).toHaveBeenCalled()
+    expect(subview.r.test.render).toHaveBeenCalled()
 
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
@@ -322,9 +322,9 @@ describe "check functionality when setElement call",->
     expect(2).toEqual @view.click_counter
 
   it "check regions binding",->
-    $old = @view.test.$el
+    $old = @view.r.test.$el
     @view.setElement $("<div>")
-    expect($old).not.toEqual @view.test.$el
+    expect($old).not.toEqual @view.r.test.$el
 
   it "check template reload",->
     templateWithRegion = '<div class="test_template"><div></div></div>'
