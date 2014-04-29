@@ -144,7 +144,7 @@ MixinBackbone = function(Backbone) {
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];
-            this[k].showCurrent(_callback);
+            this.r[k].showCurrent(_callback);
           }
         } else {
           finish();
@@ -180,7 +180,7 @@ MixinBackbone = function(Backbone) {
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];
-            this[k].closeCurrent(_callback);
+            this.r[k].closeCurrent(_callback);
           }
         } else {
           finish();
@@ -308,13 +308,16 @@ MixinBackbone = function(Backbone) {
         _results = [];
         for (k in _ref) {
           v = _ref[k];
-          this[k].remove();
-          _results.push(delete this[k]);
+          this.r[k].remove();
+          _results.push(delete this.r[k]);
         }
         return _results;
       },
       bindRegions: function() {
         var View, el, k, v, _ref, _results;
+        if (this.r == null) {
+          this.r = {};
+        }
         if (!this.regions) {
           return;
         }
@@ -329,10 +332,10 @@ MixinBackbone = function(Backbone) {
             el = this.$el.find(v);
             View = MixinBackbone(Backbone.View);
           }
-          if (this[k] != null) {
-            _results.push(this[k].setElement(el));
+          if (this.r[k] != null) {
+            _results.push(this.r[k].setElement(el));
           } else {
-            _results.push(this[k] = new View({
+            _results.push(this.r[k] = new View({
               el: el
             }));
           }

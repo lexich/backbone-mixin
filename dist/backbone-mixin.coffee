@@ -138,7 +138,7 @@ MixinBackbone = (Backbone)->
         if(regions = _.result(this,"regions"))
           keys = _.keys(regions)
           _callback = _.after _.size(keys), finish      #->finish 1
-          this[k].showCurrent _callback for k in keys
+          this.r[k].showCurrent _callback for k in keys
         else
           finish()                                      #->finish 1
 
@@ -160,7 +160,7 @@ MixinBackbone = (Backbone)->
         if(regions = _.result(this,"regions"))
           keys = _.keys(regions)
           _callback = _.after _.size(keys), finish      #->finish 1
-          this[k].closeCurrent _callback for k in keys
+          this.r[k].closeCurrent _callback for k in keys
         else
           finish()                                      #->finish 1
 
@@ -263,10 +263,11 @@ MixinBackbone = (Backbone)->
       unbindRegions:->
         return unless @regions
         for k,v of @regions
-          this[k].remove()
-          delete this[k]
+          this.r[k].remove()
+          delete this.r[k]
 
       bindRegions:->
+        @r ?= {}
         return unless @regions
         for k,v of @regions
           if _.isObject(v)
@@ -279,8 +280,8 @@ MixinBackbone = (Backbone)->
             el = @$el.find(v)
             View = MixinBackbone(Backbone.View)
 
-          if this[k]? then this[k].setElement el
-          else this[k] = new View {el}
+          if this.r[k]? then this.r[k].setElement el
+          else this.r[k] = new View {el}
 
       bindUIElements:->
         return unless @ui?
