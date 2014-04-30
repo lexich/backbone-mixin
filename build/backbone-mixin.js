@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.2.9";
+  MixinBackbone.version = "0.2.10";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       setElement: function() {
@@ -64,11 +64,17 @@ MixinBackbone = function(Backbone) {
         }
         return (_ref = BaseClass.prototype.delegateEvents) != null ? _ref.call(this, events) : void 0;
       },
-      listenToValue: function(obj, name, callback) {
-        obj.on("change:" + name, callback, this);
+      listenToValue: function(obj, _name, callback) {
+        var name;
+        if (/change:(.+)/.exec(_name)) {
+          name = RegExp.$1;
+        } else {
+          name = _name;
+        }
+        this.listenTo(obj, "change:" + name, callback);
         return setTimeout(((function(_this) {
           return function() {
-            return callback.call(_this, obj, obj.get(name));
+            return callback.call(_this, obj, obj.get(name), {});
           };
         })(this)), 0);
       },

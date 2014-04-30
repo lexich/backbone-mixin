@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.2.9"
+  MixinBackbone.version = "0.2.10"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       #
@@ -58,8 +58,12 @@ MixinBackbone = (Backbone)->
       # @lang=ru Хелпер позволяет повесить слушателя на obj 
       # на измение значения name и сразу же вызвать callback для текущего значения
       #
-      listenToValue:(obj, name, callback) ->
-        obj.on "change:#{name}", callback, this
+      listenToValue:(obj, _name, callback) ->
+        if /change:(.+)/.exec _name
+          name = RegExp.$1
+        else
+          name = _name
+        @listenTo obj, "change:#{name}", callback        
         setTimeout (=>
           callback.call this, obj, obj.get(name),{}
         ), 0
@@ -102,6 +106,12 @@ MixinBackbone = (Backbone)->
       #
       _setCurrentView:(view)->
         @_$_p.currentView = view
+
+      #
+      # @lang=en
+      #
+      # @lang=ru
+      #
 
       show:(_view, options = {},callback)->
         unless _view?

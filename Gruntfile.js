@@ -69,12 +69,16 @@ module.exports = function(grunt) {
       options:{
         configFile: 'karma.conf.js',
         runnerPort: 9999,        
-        //browsers: ['PhantomJS'],        
+        //browsers: ['PhantomJS'],
       },
       dist: {
         singleRun: true
       },
-      watch:{}
+      watch:{
+        options:{
+          browsers: ['Chrome'],
+        }
+      }
     }
   });  
   grunt.registerTask('build', [
