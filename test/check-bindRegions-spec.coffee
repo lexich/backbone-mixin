@@ -6,7 +6,7 @@ describe "Check MixinBackbone bindRegions", ->
     view = new TestView()
     expect(!!view.regions).toBeTruthy()
     view.remove()
-    expect(!view.test).toBeTruthy()
+    expect(!view.r.test).toBeTruthy()
   it "check custom regions with selector",->
     RegionView = do(SuperClass = MixinBackbone(Backbone.View) )->
       SuperClass.extend
@@ -21,11 +21,11 @@ describe "Check MixinBackbone bindRegions", ->
 
     view = new TestView
     expect(!!view.regions).toBeTruthy()
-    expect(!!view.test).toBeTruthy()
-    expect(!!view.test.custom_region).toBeTruthy()
-    test = view.test
+    expect(!!view.r.test).toBeTruthy()
+    expect(!!view.r.test.custom_region).toBeTruthy()
+    test = view.r.test
     view.remove()
-    expect(!view.test).toBeTruthy()
+    expect(!view.r.test).toBeTruthy()
     expect(!!test.remove_custom_view).toBeTruthy()
 
 
@@ -36,5 +36,5 @@ describe "Check MixinBackbone bindRegions", ->
       regions:
         test: el:$el, view:RegionView
     view = new TestView()
-    expect(view.test.$el).toEqual($el)
+    expect(view.r.test.$el).toEqual($el)
     view.remove()

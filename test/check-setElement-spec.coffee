@@ -29,10 +29,10 @@ describe "check functionality when setElement call",->
     expect(2).toEqual @view.click_counter
 
   it "check regions binding",->
-    $old = @view.test.$el
+    $old = @view.r.test.$el
     $new = $("<div>")
     @view.setElement $new
-    expect($old).not.toEqual @view.test.$el    
+    expect($old).not.toEqual @view.r.test.$el    
 
   it "check template reload",->
     templateWithRegion = '<div class="test_template"><div></div></div>'

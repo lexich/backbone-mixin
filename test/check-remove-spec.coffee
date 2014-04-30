@@ -60,12 +60,12 @@ describe "MixinBackbone::remove",->
     
 
   it 'check remove subItems',->
-    expect(null).not.toBe @view.test
-    remove = @view.test.remove
+    expect(null).not.toBe @view.r.test
+    remove = @view.r.test.remove
     remove_count = 0
-    @view.test.remove = =>
+    @view.r.test.remove = =>
       remove_count += 1
-      remove.apply @view.test, arguments
+      remove.apply @view.r.test, arguments
     expect(0).toBe remove_count
     
     @view.remove()

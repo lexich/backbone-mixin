@@ -121,10 +121,10 @@ describe "Check show functionality:",->
 
     subview = new SubView
     spyOn subview, "render"
-    spyOn subview.test, "render"
+    spyOn subview.r.test, "render"
     @view.show subview
     expect(subview.render).toHaveBeenCalled()
-    expect(subview.test.render).toHaveBeenCalled()
+    expect(subview.r.test.render).toHaveBeenCalled()
 
   it "check setNeedRerender functionality",->
     spyOn @view, "setNeedRerenderView"
