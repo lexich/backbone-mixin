@@ -280,8 +280,9 @@ MixinBackbone = (Backbone)->
             delete this[k]
 
       bindRegions:->
-        @r ?= {}        
+        @r ?= {}
         return unless @regions
+        rx = /@ui\.([^ ]+)/
         isOldMode = _.isBoolean(@regions.__oldmode__) and @regions.__oldmode__
         for k,v of @regions
           continue if k is "__oldmode__"
@@ -292,15 +293,23 @@ MixinBackbone = (Backbone)->
               el = v.el
             View = v.view
           else
-            el = @$el.find(v)
+            if rx.exec(v)? and @ui[RegExp.$1]?
+              el = @ui[RegExp.$1]
+            else
+              el = @$el.find(v)
             View = MixinBackbone(Backbone.View)
 
-          if this.r[k]? then this.r[k].setElement el
-          else this.r[k] = new View {el}
-
-          if isOldMode
-            if this[k]? then this[k].setElement el
-            else this[k] = new View {el}
+          if this.r[k]? 
+            this.r[k].setElement el
+          else 
+            options = {el}
+            if _.isObject(v.options)
+              _.extend options, v.options
+            else if _.isFunction(v.options)
+              opt = v.options.call this
+              _.extend options, opt
+            this.r[k] = new View options
+          this[k] = this.r[k] if isOldMode and not this[k]?
 
       bindUIElements:->
         return unless @ui?

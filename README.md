@@ -100,6 +100,18 @@ render:function(){
 }
 ```
 
+Also you can use `regions` and `ui` together
+```js
+ui:{
+  test:".test"
+}
+regions:{
+  test:{
+    el:"@ui.test"
+    view:(HelloView = MixinBackbone(Backbone.View).extend({}))
+  }
+}
+```
 
 
 #### show(view,options)
