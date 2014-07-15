@@ -2,6 +2,11 @@ MixinBackbone = (Backbone)->
   MixinBackbone.version = "0.3.0"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
+      constructor:(options)->
+        @_$_options = options        
+        BaseClass::constructor?.apply this, arguments
+        delete @_$_options
+
       #
       # @lang=en overwrite default Backbone method Backbone.View.setElement
       #
@@ -16,6 +21,7 @@ MixinBackbone = (Backbone)->
             varbindUIElements:null
             var_bindings:null
         BaseClass::setElement.apply this, arguments
+        @scope? @_$_options
         @$el.addClass @className if @className?
         @reloadTemplate()
         @bindUIElements()
@@ -303,11 +309,11 @@ MixinBackbone = (Backbone)->
             this.r[k].setElement el
           else 
             options = {el}
-            if _.isObject(v.options)
-              _.extend options, v.options
-            else if _.isFunction(v.options)
-              opt = v.options.call this
+            if _.isFunction(v.scope)
+              opt = v.scope.call this
               _.extend options, opt
+            else if _.isObject(v.scope)
+              _.extend options, v.scope
             this.r[k] = new View options
           this[k] = this.r[k] if isOldMode and not this[k]?
 

@@ -24,6 +24,27 @@ describe "Check MixinBackbone bindRegions", ->
     expect(!view.r.test).toBeTruthy()
     expect(!view.test).toBeTruthy()  
 
+  it "check bind regions with options", ->
+    Model = Backbone.Model.extend {
+      defaults:
+        value:1
+    }
+    TestView = MixinBackbone(Backbone.View).extend
+      el:"<div><div class='test /></div>"
+      regions:
+        test:
+          el:".test"
+          view: MixinBackbone(Backbone.View).extend {}
+          scope:-> {@model}
+
+      scope:->
+        @model = new Model
+    view = new TestView
+    expect(!!view.r.test).toBeTruthy()
+    expect(!!view.r.test.model).toBeTruthy()
+    expect(1).toEqual view.r.test.model.get("value")
+    view.remove()
+
   it "check custom regions with selector",->
     RegionView = do(SuperClass = MixinBackbone(Backbone.View) )->
       SuperClass.extend
