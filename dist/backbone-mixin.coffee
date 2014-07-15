@@ -273,13 +273,18 @@ MixinBackbone = (Backbone)->
       unbindRegions:->
         return unless @regions
         for k,v of @regions
+          continue if k is "__oldmode__"
           this.r[k].remove()
           delete this.r[k]
+          if @regions.__oldmode__
+            delete this[k]
 
       bindRegions:->
-        @r ?= {}
+        @r ?= {}        
         return unless @regions
+        isOldMode = _.isBoolean(@regions.__oldmode__) and @regions.__oldmode__
         for k,v of @regions
+          continue if k is "__oldmode__"
           if _.isObject(v)
             el = if _.isString(v.el)
               @$el.find(v.el)
@@ -292,6 +297,10 @@ MixinBackbone = (Backbone)->
 
           if this.r[k]? then this.r[k].setElement el
           else this.r[k] = new View {el}
+
+          if isOldMode
+            if this[k]? then this[k].setElement el
+            else this[k] = new View {el}
 
       bindUIElements:->
         return unless @ui?

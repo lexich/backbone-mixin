@@ -19,11 +19,11 @@ Syntax sugar, define map of children dom elements.
   ui:{
     test:".container .test"  //definition
   },
-  event:{
-    "click ui.test":"on_click_test" //using in event binding
+  events:{
+    "click @ui.test":"on_click_test" //using in event binding
   },
   bindings:{
-    "ui.test":"text:value" //using in Epoxy bindings http://epoxyjs.org/tutorials.html#simple-bindings
+    "@ui.test":"text:value" //using in Epoxy bindings http://epoxyjs.org/tutorials.html#simple-bindings
   },
   render:function(){
     this.ui.test.show(); //direct using
@@ -35,7 +35,10 @@ Syntax sugar, define map of children dom elements.
 Type `String`
 Direct loading html template from DOM to current element (this.el)
 ```js
-template:"#Template"
+{
+  template:"#Template"  
+}
+
 ```
 ```html
 <script id="Template" type="template/text">
@@ -61,11 +64,11 @@ Type `Object`
 Sugar syntax for bingins subview. `regions` can be used for gluing current view with multiple other views
 ```js
 regions:{
-  "hello":".hello_selector"
+  hello:".hello_selector"  
 },
 render:function(){
-  //this.hello is BackboneMixin(Backbone.View) instance
-  this.hello.show(CustomBackboneView); 
+  //this.r.hello is BackboneMixin(Backbone.View) instance
+  this.r.hello.show(CustomBackboneView); 
   //now instance of CustomBackboneVIew is subview of this.hello view
 }
 ```
@@ -75,16 +78,29 @@ Also regions can use for point to point view bindings
 regions:{
   hello:{
     el:".hello_selector",
-    view: (HelloView = MixinBackbone(Backbone.View).extend({
-    }))
+    view: (HelloView = MixinBackbone(Backbone.View).extend({}))
   },
 }
 
 render:function(){
-  this.hello.$el === this.$el.find(".hello_selector");
+  this.r.hello.$el === this.$el.find(".hello_selector");
 }
 ```
 when view render with "show" mechanizm then all regions call render
+
+before version 0.3.0 regions load to `this` scope after they load in `this.r` scope. For compatible with old code you can use `__oldmode__` flag. And `__oldmode__` can't be name of region
+
+```js
+regions:{
+  __oldmode__:true
+  hello:".hello_selector"  
+},
+render:function(){
+  this.r.hello === this.hello;
+}
+```
+
+
 
 #### show(view,options)
 Type `Function`

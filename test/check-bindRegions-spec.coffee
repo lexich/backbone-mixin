@@ -7,6 +7,23 @@ describe "Check MixinBackbone bindRegions", ->
     expect(!!view.regions).toBeTruthy()
     view.remove()
     expect(!view.r.test).toBeTruthy()
+
+  it "check regions __oldmode__",->
+    TestView = MixinBackbone(Backbone.View).extend
+      regions:
+        __oldmode__:true
+        test:".test"
+    view = new TestView()
+    expect(view.regions.__oldmode__).toBeTruthy()
+    expect(!!view.regions).toBeTruthy()
+    expect(view.r.test).toBeTruthy()
+    expect(view.test).toBeTruthy()
+    expect(!view.r.__oldmode__).toBeTruthy()
+    expect(!view.__oldmode__).toBeTruthy()
+    view.remove()
+    expect(!view.r.test).toBeTruthy()
+    expect(!view.test).toBeTruthy()
+
   it "check custom regions with selector",->
     RegionView = do(SuperClass = MixinBackbone(Backbone.View) )->
       SuperClass.extend
