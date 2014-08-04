@@ -1,9 +1,17 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.3.0";
+  MixinBackbone.version = "0.3.2";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
+      constructor: function(options) {
+        var _ref;
+        this._$_options = options;
+        if ((_ref = BaseClass.prototype.constructor) != null) {
+          _ref.apply(this, arguments);
+        }
+        return delete this._$_options;
+      },
       setElement: function() {
         if (this._$_p == null) {
           this._$_p = {
@@ -15,6 +23,9 @@ MixinBackbone = function(Backbone) {
           };
         }
         BaseClass.prototype.setElement.apply(this, arguments);
+        if (typeof this.scope === "function") {
+          this.scope(this._$_options);
+        }
         if (this.className != null) {
           this.$el.addClass(this.className);
         }
@@ -314,36 +325,65 @@ MixinBackbone = function(Backbone) {
         _results = [];
         for (k in _ref) {
           v = _ref[k];
+          if (k === "__oldmode__") {
+            continue;
+          }
           this.r[k].remove();
-          _results.push(delete this.r[k]);
+          delete this.r[k];
+          if (this.regions.__oldmode__) {
+            _results.push(delete this[k]);
+          } else {
+            _results.push(void 0);
+          }
         }
         return _results;
       },
       bindRegions: function() {
-        var View, el, k, v, _ref, _results;
+        var View, el, isOldMode, k, opt, options, rx, v, _ref, _results;
         if (this.r == null) {
           this.r = {};
         }
         if (!this.regions) {
           return;
         }
+        rx = /@ui\.([^ ]+)/;
+        isOldMode = _.isBoolean(this.regions.__oldmode__) && this.regions.__oldmode__;
         _ref = this.regions;
         _results = [];
         for (k in _ref) {
           v = _ref[k];
+          if (k === "__oldmode__") {
+            continue;
+          }
           if (_.isObject(v)) {
             el = _.isString(v.el) ? this.$el.find(v.el) : el = v.el;
             View = v.view;
           } else {
-            el = this.$el.find(v);
+            if ((rx.exec(v) != null) && (this.ui[RegExp.$1] != null)) {
+              el = this.ui[RegExp.$1];
+            } else {
+              el = this.$el.find(v);
+            }
             View = MixinBackbone(Backbone.View);
           }
           if (this.r[k] != null) {
-            _results.push(this.r[k].setElement(el));
+            this.r[k].setElement(el);
           } else {
-            _results.push(this.r[k] = new View({
+            options = {
               el: el
-            }));
+            };
+            if (_.isFunction(v.scope)) {
+              opt = v.scope.call(this);
+              _.extend(options, opt);
+            } else if (_.isObject(v.scope)) {
+              _.extend(options, v.scope);
+            }
+            this.r[k] = new View(options);
+          }
+          if (isOldMode && (this[k] == null)) {
+            _results.push(this[k] = this.r[k]);
+          } else {
+            _results.push(void 0);
           }
         }
         return _results;
