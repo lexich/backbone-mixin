@@ -48,3 +48,10 @@ describe "Check MixinBackbone DI",->
     expect(1).toBe _.size(values)
     expect(view1).toBe values[0]
 
+  it "create new instance after it was removed", ->
+    view1 = @view.getViewDI @TestViewDI
+    view1.remove()
+    view2 = @view.getViewDI @TestViewDI
+    expect(view2?._$_p?.removeFlag).toBe false
+
+

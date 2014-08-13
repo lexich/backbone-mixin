@@ -254,8 +254,16 @@ MixinBackbone = (Backbone)->
           TypeView = ViewClass.type
           TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
           key =  ViewClass.key
-        unless @_$_p.diViews[key]?
-          @_$_p.diViews[key] = new TypeView options
+        diview = @_$_p.diViews[key]
+        removeFlag = !!diview?._$_p?.removeFlag
+        if not diview? or removeFlag
+          @_$_p.diViews[key] = view = new TypeView options
+          unless view._$_p?
+            view._$_p =  {removeFlag: false}
+            remove = view.remove
+            view.remove = ->
+              remove.apply view, arguments
+              view._$_p.removeFlag = true
         @_$_p.diViews[key]
 
       reloadTemplate:->
