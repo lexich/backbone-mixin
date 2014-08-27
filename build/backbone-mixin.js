@@ -157,7 +157,7 @@ MixinBackbone = function(Backbone) {
           };
         })(this));
         if ((regions = _.result(this, "regions"))) {
-          keys = _.keys(regions);
+          keys = _.chain(regions).keys().without(keys, '__oldmode__').value();
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];
@@ -193,7 +193,7 @@ MixinBackbone = function(Backbone) {
           };
         })(this));
         if ((regions = _.result(this, "regions"))) {
-          keys = _.keys(regions);
+          keys = _.chain(regions).keys().without(keys, '__oldmode__').value();
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];
@@ -274,7 +274,7 @@ MixinBackbone = function(Backbone) {
         }
       },
       getViewDI: function(ViewClass, options) {
-        var TypeView, key;
+        var TypeView, diview, key, remove, removeFlag, view, _ref;
         if (options == null) {
           options = {};
         }
@@ -290,8 +290,20 @@ MixinBackbone = function(Backbone) {
           TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
-        if (this._$_p.diViews[key] == null) {
-          this._$_p.diViews[key] = new TypeView(options);
+        diview = this._$_p.diViews[key];
+        removeFlag = !!(diview != null ? (_ref = diview._$_p) != null ? _ref.removeFlag : void 0 : void 0);
+        if ((diview == null) || removeFlag) {
+          this._$_p.diViews[key] = view = new TypeView(options);
+          if (view._$_p == null) {
+            view._$_p = {
+              removeFlag: false
+            };
+            remove = view.remove;
+            view.remove = function() {
+              remove.apply(view, arguments);
+              return view._$_p.removeFlag = true;
+            };
+          }
         }
         return this._$_p.diViews[key];
       },
