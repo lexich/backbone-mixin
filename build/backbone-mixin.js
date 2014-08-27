@@ -274,7 +274,7 @@ MixinBackbone = function(Backbone) {
         }
       },
       getViewDI: function(ViewClass, options) {
-        var TypeView, key;
+        var TypeView, diview, key, remove, removeFlag, view, _ref;
         if (options == null) {
           options = {};
         }
@@ -284,14 +284,26 @@ MixinBackbone = function(Backbone) {
           this._$_p.diViews[key] = ViewClass;
         } else if (typeof ViewClass === "function") {
           TypeView = ViewClass;
-          key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
+          key = TypeView._$_di || (TypeView._$_di = _.uniqueId("_$_di"));
         } else {
           TypeView = ViewClass.type;
-          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
+          TypeView._$_di || (TypeView._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
-        if (this._$_p.diViews[key] == null) {
-          this._$_p.diViews[key] = new TypeView(options);
+        diview = this._$_p.diViews[key];
+        removeFlag = !!(diview != null ? (_ref = diview._$_p) != null ? _ref.removeFlag : void 0 : void 0);
+        if ((diview == null) || removeFlag) {
+          this._$_p.diViews[key] = view = new TypeView(options);
+          if (view._$_p == null) {
+            view._$_p = {
+              removeFlag: false
+            };
+            remove = view.remove;
+            view.remove = function() {
+              remove.apply(view, arguments);
+              return view._$_p.removeFlag = true;
+            };
+          }
         }
         return this._$_p.diViews[key];
       },

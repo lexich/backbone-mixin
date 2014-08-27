@@ -249,10 +249,10 @@ MixinBackbone = (Backbone)->
           @_$_p.diViews[key] = ViewClass
         else if typeof(ViewClass) is "function"
           TypeView = ViewClass
-          key = TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
+          key = TypeView._$_di or (TypeView._$_di = _.uniqueId("_$_di"))
         else
           TypeView = ViewClass.type
-          TypeView::_$_di or (TypeView::_$_di = _.uniqueId("_$_di"))
+          TypeView._$_di or (TypeView._$_di = _.uniqueId("_$_di"))
           key =  ViewClass.key
         diview = @_$_p.diViews[key]
         removeFlag = !!diview?._$_p?.removeFlag

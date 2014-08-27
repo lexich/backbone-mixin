@@ -44,7 +44,7 @@ describe "Check MixinBackbone DI",->
     keys = @view._diViewsKeys()
     values = @view._diViewsValues()
     expect(1).toBe _.size(keys)
-    expect(@TestViewDI::_$_di).toBe keys[0]
+    expect(@TestViewDI._$_di).toBe keys[0]
     expect(1).toBe _.size(values)
     expect(view1).toBe values[0]
 
@@ -54,4 +54,10 @@ describe "Check MixinBackbone DI",->
     view2 = @view.getViewDI @TestViewDI
     expect(view2?._$_p?.removeFlag).toBe false
 
+  it "correct work with prototype inheritance", ->
+    ParentView = Backbone.View.extend {}
+    ChildView = ParentView.extend {}
 
+    parentView = @view.getViewDI ParentView
+    childView = @view.getViewDI ChildView
+    expect(parentView).not.toBe childView
