@@ -1,7 +1,7 @@
 var MixinBackbone;
 
 MixinBackbone = function(Backbone) {
-  MixinBackbone.version = "0.3.3";
+  MixinBackbone.version = "0.3.4";
   MixinBackbone = function(BaseClass) {
     return BaseClass.extend({
       constructor: function(options) {
