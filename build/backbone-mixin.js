@@ -284,10 +284,10 @@ MixinBackbone = function(Backbone) {
           this._$_p.diViews[key] = ViewClass;
         } else if (typeof ViewClass === "function") {
           TypeView = ViewClass;
-          key = TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
+          key = TypeView._$_di || (TypeView._$_di = _.uniqueId("_$_di"));
         } else {
           TypeView = ViewClass.type;
-          TypeView.prototype._$_di || (TypeView.prototype._$_di = _.uniqueId("_$_di"));
+          TypeView._$_di || (TypeView._$_di = _.uniqueId("_$_di"));
           key = ViewClass.key;
         }
         diview = this._$_p.diViews[key];
