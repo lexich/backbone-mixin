@@ -157,7 +157,7 @@ MixinBackbone = function(Backbone) {
           };
         })(this));
         if ((regions = _.result(this, "regions"))) {
-          keys = _.keys(regions);
+          keys = _.chain(regions).keys().without(keys, '__oldmode__').value();
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];
@@ -193,7 +193,7 @@ MixinBackbone = function(Backbone) {
           };
         })(this));
         if ((regions = _.result(this, "regions"))) {
-          keys = _.keys(regions);
+          keys = _.chain(regions).keys().without(keys, '__oldmode__').value();
           _callback = _.after(_.size(keys), finish);
           for (_i = 0, _len = keys.length; _i < _len; _i++) {
             k = keys[_i];

@@ -22,7 +22,18 @@ describe "Check MixinBackbone bindRegions", ->
     expect(!view.__oldmode__).toBeTruthy()
     view.remove()
     expect(!view.r.test).toBeTruthy()
-    expect(!view.test).toBeTruthy()  
+    expect(!view.test).toBeTruthy() 
+
+  it "check regions __oldmode__ work correct in shown view",->
+    ContainerView = MixinBackbone(Backbone.View).extend {}
+    TestView = MixinBackbone(Backbone.View).extend
+      regions:
+        __oldmode__:true
+        test:".test"
+    container = new ContainerView
+    view = new TestView
+    container.show view
+    container.close view
 
   it "check bind regions with options", ->
     Model = Backbone.Model.extend {
