@@ -152,7 +152,11 @@ MixinBackbone = (Backbone)->
         finish = _.after 3, => callback?()              #--finish 3 times
 
         if(regions = _.result(this,"regions"))
-          keys = _.keys(regions)
+          keys = _.chain(regions)
+          .keys()
+          .without(keys , '__oldmode__')
+          .value()
+
           _callback = _.after _.size(keys), finish      #->finish 1
           this.r[k].showCurrent _callback for k in keys
         else
@@ -174,7 +178,10 @@ MixinBackbone = (Backbone)->
         finish = _.after 3, =>  callback?()             #--finish 3 times
 
         if(regions = _.result(this,"regions"))
-          keys = _.keys(regions)
+          keys = _.chain(regions)
+          .keys()
+          .without(keys , '__oldmode__')
+          .value()
           _callback = _.after _.size(keys), finish      #->finish 1
           this.r[k].closeCurrent _callback for k in keys
         else
