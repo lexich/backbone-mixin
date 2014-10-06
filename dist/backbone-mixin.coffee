@@ -1,5 +1,5 @@
 MixinBackbone = (Backbone)->
-  MixinBackbone.version = "0.3.4"
+  MixinBackbone.version = "0.3.5"
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       constructor:(options)->
