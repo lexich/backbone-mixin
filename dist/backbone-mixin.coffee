@@ -61,7 +61,7 @@ MixinBackbone = (Backbone)->
       # @lang=en Helper helps listen obj for name change
       # and callback for current value
       #
-      # @lang=ru Хелпер позволяет повесить слушателя на obj 
+      # @lang=ru Хелпер позволяет повесить слушателя на obj
       # на измение значения name и сразу же вызвать callback для текущего значения
       #
       listenToValue:(obj, _name, callback) ->
@@ -142,6 +142,13 @@ MixinBackbone = (Backbone)->
         view
 
       showCurrent:(callback)->
+      #
+      # @lang=en show current view
+      #   callback - function call, invokes when current view is shown
+      #
+      # @lang=ru Показать текущую view
+      #   callback - вызов функции, когда показ текущей view завершился успехом
+      #
         this.trigger "onBeforeShow"
         @onBeforeShow?()
         unless @_$_oneShow?
@@ -173,6 +180,13 @@ MixinBackbone = (Backbone)->
           finish()                                      #->finish 3
 
       closeCurrent:(callback)->
+      #
+      # @lang=en close current view
+      #   callback - function call, invokes when current view is closed
+      #
+      # @lang=ru Показать текущую view
+      #   callback - вызов функции, когда закрытие текущей view завершилося успехом
+      #
         this.trigger "onBeforeClose"
         @onBeforeClose?()
         finish = _.after 3, =>  callback?()             #--finish 3 times
@@ -196,7 +210,11 @@ MixinBackbone = (Backbone)->
           @trigger "onClose"
           @onClose?()
           finish()                                      #->finish 3
-
+      #
+      # @lang=en Close view
+      #
+      # @lang=ru Закрытие view
+      #
       close:(_view, callback)->
         unless _view?
           callback?()
@@ -272,7 +290,11 @@ MixinBackbone = (Backbone)->
               remove.apply view, arguments
               view._$_p.removeFlag = true
         @_$_p.diViews[key]
-
+      #
+      # @lang=en Reload html template in root dom-element
+      #
+      # @lang=ru Перезаливка html шаблона в корневой dom элемент
+      #
       reloadTemplate:->
         template = null
         data = null
@@ -290,7 +312,11 @@ MixinBackbone = (Backbone)->
           @$el.html @templateFunc(template, data)
         else if template?
           @$el.html template
-
+      #
+      # @lang=en unbingind regions for current view
+      #
+      # @lang=ru деинициализация регионов для текущей view
+      #
       unbindRegions:->
         return unless @regions
         for k,v of @regions
@@ -299,7 +325,11 @@ MixinBackbone = (Backbone)->
           delete this.r[k]
           if @regions.__oldmode__
             delete this[k]
-
+      #
+      # @lang=en binding regions for current view
+      #
+      # @lang=ru инициализация регионов для текущей view
+      #
       bindRegions:->
         @r ?= {}
         return unless @regions
@@ -331,7 +361,11 @@ MixinBackbone = (Backbone)->
               _.extend options, v.scope
             this.r[k] = new View options
           this[k] = this.r[k] if isOldMode and not this[k]?
-
+      #
+      # @lang=en binding ui elements for current view
+      #
+      # @lang=ru инициализация ui элементов для текущей view
+      #
       bindUIElements:->
         return unless @ui?
         @unbindUIElements()
@@ -339,12 +373,20 @@ MixinBackbone = (Backbone)->
         @ui = {}
         for k, v of @_$_p.varbindUIElements
           @ui[k] = @$el.find v
-
+      #
+      # @lang=en unbinding ui elements for current view
+      #
+      # @lang=ru деинициализация ui элементов для текущей view
+      #
       unbindUIElements:->
         return unless @_$_p.varbindUIElements?
         @ui = @_$_p.varbindUIElements
         @_$_p.varbindUIElements = null
-
+      #
+      # @lang=en binding ui elements for current view with epoxy support
+      #
+      # @lang=ru инициализация ui элементов для текущей view с поддержкой epoxy
+      #
       bindUIEpoxy:->
         return unless @bindings
         @unbindUIEpoxy()
@@ -359,7 +401,11 @@ MixinBackbone = (Backbone)->
             memo[k] = v
           memo
         ),{}
-
+      #
+      # @lang=en binding ui elements for current view with epoxy support
+      #
+      # @lang=ru инициализация ui элементов для текущей view c поддержкой epoxy
+      #
       unbindUIEpoxy:->
         return unless @_$_p.var_bindings?
         @bindings = @_$_p.var_bindings
