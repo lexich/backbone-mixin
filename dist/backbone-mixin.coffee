@@ -132,7 +132,7 @@ MixinBackbone = (Backbone)->
             if this isnt view
               @_setCurrentView view
             @$el.append view.$el
-            view.showCurrent callback
+            view.showCurrent callback, this
             view
 
         if @_$_p.currentView? and this isnt @_$_p.currentView
@@ -140,15 +140,16 @@ MixinBackbone = (Backbone)->
         else
           __show()
         view
-
-      showCurrent:(callback)->
       #
       # @lang=en show current view
       #   callback - function call, invokes when current view is shown
+      #   parent - parent view
       #
       # @lang=ru Показать текущую view
       #   callback - вызов функции, когда показ текущей view завершился успехом
+      #   parent - родительская view
       #
+      showCurrent: (callback, parent=this)->
         this.trigger "onBeforeShow"
         @onBeforeShow?()
         unless @_$_oneShow?
@@ -165,28 +166,29 @@ MixinBackbone = (Backbone)->
           .value()
 
           _callback = _.after _.size(keys), finish      #->finish 1
-          this.r[k].showCurrent _callback for k in keys
+          this.r[k].showCurrent _callback, this for k in keys
         else
           finish()                                      #->finish 1
 
         if @_$_p.currentView? and @_$_p.currentView isnt this
-          @_$_p.currentView.showCurrent finish          #->finish 2
+          @_$_p.currentView.showCurrent finish, parent  #->finish 2
         else
           finish()                                      #->finish 2
 
-        @showAnimation =>
+        parent.showViewAnimation this, =>
           @trigger "onShow"
           @onShow?()
           finish()                                      #->finish 3
-
-      closeCurrent:(callback)->
       #
       # @lang=en close current view
       #   callback - function call, invokes when current view is closed
+      #   parent - parent view
       #
       # @lang=ru Показать текущую view
       #   callback - вызов функции, когда закрытие текущей view завершилося успехом
+      #   parent - родительская view
       #
+      closeCurrent:(callback, parent=this)->
         this.trigger "onBeforeClose"
         @onBeforeClose?()
         finish = _.after 3, =>  callback? this         #--finish 3 times
@@ -197,16 +199,16 @@ MixinBackbone = (Backbone)->
           .without(keys , '__oldmode__')
           .value()
           _callback = _.after _.size(keys), finish      #->finish 1
-          this.r[k].closeCurrent _callback for k in keys
+          this.r[k].closeCurrent _callback, this for k in keys
         else
           finish()                                      #->finish 1
 
         if @_$_p.currentView? and @_$_p.currentView isnt this
-          @_$_p.currentView.closeCurrent finish         #->finish 2
+          @_$_p.currentView.closeCurrent finish, parent  #->finish 2
         else
           finish()                                      #->finish 2
 
-        @closeAnimation =>
+        parent.closeViewAnimation this, =>
           @trigger "onClose"
           @onClose?()
           finish()                                      #->finish 3
