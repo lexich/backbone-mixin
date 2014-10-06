@@ -121,11 +121,11 @@ MixinBackbone = (Backbone)->
 
       show:(_view, options = {},callback)->
         unless _view?
-          callback?()
+          callback? _view
           return
         view = @getViewDI _view, options
         if view is @_$_p.currentView
-          callback?()
+          callback? view
           return view
         __show = =>
             @_setCurrentView null
@@ -156,7 +156,7 @@ MixinBackbone = (Backbone)->
           this.trigger "render"
           @render()
 
-        finish = _.after 3, => callback?()              #--finish 3 times
+        finish = _.after 3, => callback? this              #--finish 3 times
 
         if(regions = _.result(this,"regions"))
           keys = _.chain(regions)
@@ -189,7 +189,7 @@ MixinBackbone = (Backbone)->
       #
         this.trigger "onBeforeClose"
         @onBeforeClose?()
-        finish = _.after 3, =>  callback?()             #--finish 3 times
+        finish = _.after 3, =>  callback? this         #--finish 3 times
 
         if(regions = _.result(this,"regions"))
           keys = _.chain(regions)
@@ -217,16 +217,16 @@ MixinBackbone = (Backbone)->
       #
       close:(_view, callback)->
         unless _view?
-          callback?()
+          callback? _view
           return
-        finish = _.after 2, => callback?()              #--finish 3 times
+        finish = _.after 2, => callback? _view              #--finish 3 times
         if @_$_p.currentView? and @_$_p.currentView isnt _view
           @close @_$_p.currentView, finish
         else
           finish()
 
         @_setCurrentView null
-        _view.closeCurrent finish
+        _view.closeCurrent finish, this
         _view
 
       # Alias showViewAnimation(this)
@@ -240,24 +240,24 @@ MixinBackbone = (Backbone)->
       # Helper method which can descride animation/behavior for `view` while base view `show` `view`. By default using `view.$el.show()`
       showViewAnimation:(view, callback)->
         unless view?
-          callback?()
+          callback? view
           return
         if view.showAnimation? and view isnt this
           view.showAnimation callback
         else
           view.$el.show()
-          callback?()
+          callback? view
 
       # Helper method which can descride animation/behavior for `view` while base view `close` `view`. By default using `view.$el.show()`
       closeViewAnimation:(view, callback)->
         unless view?
-          callback?()
+          callback? view
           return
         if view.closeAnimation? and view isnt this
           view.closeAnimation callback
         else
           view.$el.hide()
-          callback?()
+          callback? view
 
       # Depedencies Injection functionality
       # `options` - options for `new View(options)`  operations
