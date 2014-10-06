@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>backbone-mixin.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>backbone-mixin.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">MixinBackbone</span> = <span class="hljs-params">(Backbone)</span>-&gt;</span>
+  MixinBackbone.version = <span class="hljs-string">"0.3.5"</span>
+<span class="hljs-function">  <span class="hljs-title">MixinBackbone</span> = <span class="hljs-params">(BaseClass)</span>-&gt;</span>
+    BaseClass.extend
+      <span class="hljs-attribute">constructor</span>:<span class="hljs-function"><span class="hljs-params">(options)</span>-&gt;</span>
+        <span class="hljs-property">@_$_options</span> = options
+        <span class="hljs-attribute">BaseClass</span>::constructor?.apply <span class="hljs-keyword">this</span>, arguments
+        <span class="hljs-keyword">delete</span> <span class="hljs-property">@_$_options</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>@lang=en overwrite default Backbone method Backbone.View.setElement</p>
+<p>@lang=ru Перегрузка стандартного метода Backbone.View.setElement</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">setElement</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">unless</span> <span class="hljs-property">@_$_p</span>?
+          <span class="hljs-property">@_$_p</span> =
+            <span class="hljs-attribute">currentView</span>:<span class="hljs-literal">null</span>
+            <span class="hljs-attribute">diViews</span>:{}
+            <span class="hljs-attribute">removeFlag</span>:<span class="hljs-literal">false</span>
+            <span class="hljs-attribute">varbindUIElements</span>:<span class="hljs-literal">null</span>
+            <span class="hljs-attribute">var_bindings</span>:<span class="hljs-literal">null</span>
+        <span class="hljs-attribute">BaseClass</span>::setElement.apply <span class="hljs-keyword">this</span>, arguments
+        <span class="hljs-property">@scope</span>? <span class="hljs-property">@_$_options</span>
+        <span class="hljs-property">@$el</span>.addClass <span class="hljs-property">@className</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@className</span>?
+        <span class="hljs-property">@reloadTemplate</span>()
+        <span class="hljs-property">@bindUIElements</span>()
+        <span class="hljs-property">@bindRegions</span>()
+        <span class="hljs-property">@bindUIEpoxy</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>@lang=en overwrite default Backbone method Backbone.View.remove</p>
+<p>@lang=ru Перегрузка стандартного метода Backbone.View.remove</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">remove</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.removeFlag <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> <span class="hljs-keyword">else</span> <span class="hljs-property">@_$_p</span>.removeFlag = <span class="hljs-literal">true</span>
+        <span class="hljs-attribute">BaseClass</span>::remove.apply <span class="hljs-keyword">this</span>, arguments
+        <span class="hljs-property">@unbindRegions</span>()
+        <span class="hljs-property">@unbindUIElements</span>()
+        view.remove() <span class="hljs-keyword">for</span> k,view <span class="hljs-keyword">of</span> <span class="hljs-property">@_$_p</span>.diViews
+        <span class="hljs-property">@_$_p</span>.diViews = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>@lang=en overwrite default Backbone method Backbone.View.delegateEvents</p>
+<p>@lang=ru Перегрузка стандартного метода Backbone.View.delegateEvents</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">delegateEvents</span>:<span class="hljs-function"><span class="hljs-params">(events)</span>-&gt;</span>
+        events <span class="hljs-keyword">or</span> (events = _.result(<span class="hljs-keyword">this</span>,<span class="hljs-string">'events'</span>))
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.varbindUIElements? <span class="hljs-keyword">and</span> events?
+          events = _.reduce events, <span class="hljs-function">(<span class="hljs-params">(memo, v,k)</span>=&gt;</span>
+            result = k.match(<span class="hljs-regexp">/@ui\.[^ ,]+/g</span>)
+            <span class="hljs-keyword">if</span> result? <span class="hljs-keyword">then</span> <span class="hljs-keyword">for</span> part <span class="hljs-keyword">in</span> result
+              <span class="hljs-keyword">if</span> <span class="hljs-regexp">/@ui\.([^ ,]+)/</span>.exec(part)?
+                selector = <span class="hljs-property">@_$_p</span>.varbindUIElements[RegExp.$<span class="hljs-number">1</span>]
+                k = k.replace part, selector
+            memo[k] = v
+            memo
+          ),{}
+        <span class="hljs-attribute">BaseClass</span>::delegateEvents?.call <span class="hljs-keyword">this</span>, events</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>@lang=en Helper helps listen obj for name change
+and callback for current value</p>
+<p>@lang=ru Хелпер позволяет повесить слушателя на obj
+на измение значения name и сразу же вызвать callback для текущего значения</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">listenToValue</span>:<span class="hljs-function"><span class="hljs-params">(obj, _name, callback)</span> -&gt;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-regexp">/change:(.+)/</span>.exec _name
+          name = RegExp.$<span class="hljs-number">1</span>
+        <span class="hljs-keyword">else</span>
+          name = _name
+        <span class="hljs-property">@listenTo</span> obj, <span class="hljs-string">"change:<span class="hljs-subst">#{name}</span>"</span>, callback
+        setTimeout (<span class="hljs-function">=&gt;</span>
+          callback.call <span class="hljs-keyword">this</span>, obj, obj.get(name),{}
+        ), <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>@lang=en Get keys of all DI views</p>
+<p>@lang=ru Получение всех ключей из DI-кэша</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">_diViewsKeys</span>:<span class="hljs-function">-&gt;</span> _.keys(<span class="hljs-property">@_$_p</span>.diViews)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>@lang=en Get all DI views</p>
+<p>@lang=ru Получение всех значений из DI-кэша</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">_diViewsValues</span>:<span class="hljs-function">-&gt;</span> _.values(<span class="hljs-property">@_$_p</span>.diViews)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>@lang=en <code>show</code> mechanizm call <code>view.render</code> function only while first calling.
+<code>setNeedRerenderView</code> forse call <code>view.render</code> function once again</p>
+<p>@lang=ru Метод устанавливает флаг, который позволяет при вызове <code>show(view)</code>
+повторно вызвать метод <code>render</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">setNeedRerenderView</span>:<span class="hljs-function"><span class="hljs-params">(view)</span>-&gt;</span>
+        view._$_oneShow = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>@lang=en Alias setNeedRerenderView(this)</p>
+<p>@lang=ru Псевдоним конструкции</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">setNeedRerender</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@setNeedRerenderView</span> <span class="hljs-keyword">this</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>@lang=en private method to set current open view</p>
+<p>@lang=ru приватный метод для установки текущей открытой view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">_setCurrentView</span>:<span class="hljs-function"><span class="hljs-params">(view)</span>-&gt;</span>
+        <span class="hljs-property">@_$_p</span>.currentView = view</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>@lang=en</p>
+<p>@lang=ru</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+      <span class="hljs-attribute">show</span>:<span class="hljs-function"><span class="hljs-params">(_view, options = {},callback)</span>-&gt;</span>
+        <span class="hljs-keyword">unless</span> _view?
+          callback? _view
+          <span class="hljs-keyword">return</span>
+        view = <span class="hljs-property">@getViewDI</span> _view, options
+        <span class="hljs-keyword">if</span> view <span class="hljs-keyword">is</span> <span class="hljs-property">@_$_p</span>.currentView
+          callback? view
+          <span class="hljs-keyword">return</span> view
+<span class="hljs-function">        <span class="hljs-title">__show</span> = =&gt;</span>
+            <span class="hljs-property">@_setCurrentView</span> <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">this</span> <span class="hljs-keyword">isnt</span> view
+              <span class="hljs-property">@_setCurrentView</span> view
+            <span class="hljs-property">@$el</span>.append view.$el
+            view.showCurrent callback, <span class="hljs-keyword">this</span>
+            view
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.currentView? <span class="hljs-keyword">and</span> <span class="hljs-keyword">this</span> <span class="hljs-keyword">isnt</span> <span class="hljs-property">@_$_p</span>.currentView
+          <span class="hljs-property">@close</span> <span class="hljs-property">@_$_p</span>.currentView, __show
+        <span class="hljs-keyword">else</span>
+          __show()
+        view</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>@lang=en show current view
+  callback - function call, invokes when current view is shown
+  parent - parent view</p>
+<p>@lang=ru Показать текущую view
+  callback - вызов функции, когда показ текущей view завершился успехом
+  parent - родительская view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">showCurrent</span>: <span class="hljs-function"><span class="hljs-params">(callback, parent=<span class="hljs-keyword">this</span>)</span>-&gt;</span>
+        <span class="hljs-keyword">this</span>.trigger <span class="hljs-string">"onBeforeShow"</span>
+        <span class="hljs-property">@onBeforeShow</span>?()
+        <span class="hljs-keyword">unless</span> <span class="hljs-property">@_$_oneShow</span>?
+          <span class="hljs-property">@_$_oneShow</span> = <span class="hljs-literal">true</span>
+          <span class="hljs-keyword">this</span>.trigger <span class="hljs-string">"render"</span>
+          <span class="hljs-property">@render</span>()
+
+        finish = _.after <span class="hljs-number">3</span>,<span class="hljs-function"> =&gt;</span> callback? <span class="hljs-keyword">this</span>              <span class="hljs-comment">#--finish 3 times</span>
+
+        <span class="hljs-keyword">if</span>(regions = _.result(<span class="hljs-keyword">this</span>,<span class="hljs-string">"regions"</span>))
+          keys = _.chain(regions)
+          .keys()
+          .without(keys , <span class="hljs-string">'__oldmode__'</span>)
+          .value()
+
+          _callback = _.after _.size(keys), finish      <span class="hljs-comment">#-&gt;finish 1</span>
+          <span class="hljs-keyword">this</span>.r[k].showCurrent _callback, <span class="hljs-keyword">this</span> <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> keys
+        <span class="hljs-keyword">else</span>
+          finish()                                      <span class="hljs-comment">#-&gt;finish 1</span>
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.currentView? <span class="hljs-keyword">and</span> <span class="hljs-property">@_$_p</span>.currentView <span class="hljs-keyword">isnt</span> <span class="hljs-keyword">this</span>
+          <span class="hljs-property">@_$_p</span>.currentView.showCurrent finish, parent  <span class="hljs-comment">#-&gt;finish 2</span>
+        <span class="hljs-keyword">else</span>
+          finish()                                      <span class="hljs-comment">#-&gt;finish 2</span>
+
+        parent.showViewAnimation <span class="hljs-keyword">this</span>,<span class="hljs-function"> =&gt;</span>
+          <span class="hljs-property">@trigger</span> <span class="hljs-string">"onShow"</span>
+          <span class="hljs-property">@onShow</span>?()
+          finish()                                      <span class="hljs-comment">#-&gt;finish 3</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>@lang=en close current view
+  callback - function call, invokes when current view is closed
+  parent - parent view</p>
+<p>@lang=ru Показать текущую view
+  callback - вызов функции, когда закрытие текущей view завершилося успехом
+  parent - родительская view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">closeCurrent</span>:<span class="hljs-function"><span class="hljs-params">(callback, parent=<span class="hljs-keyword">this</span>)</span>-&gt;</span>
+        <span class="hljs-keyword">this</span>.trigger <span class="hljs-string">"onBeforeClose"</span>
+        <span class="hljs-property">@onBeforeClose</span>?()
+        finish = _.after <span class="hljs-number">3</span>,<span class="hljs-function"> =&gt;</span>  callback? <span class="hljs-keyword">this</span>         <span class="hljs-comment">#--finish 3 times</span>
+
+        <span class="hljs-keyword">if</span>(regions = _.result(<span class="hljs-keyword">this</span>,<span class="hljs-string">"regions"</span>))
+          keys = _.chain(regions)
+          .keys()
+          .without(keys , <span class="hljs-string">'__oldmode__'</span>)
+          .value()
+          _callback = _.after _.size(keys), finish      <span class="hljs-comment">#-&gt;finish 1</span>
+          <span class="hljs-keyword">this</span>.r[k].closeCurrent _callback, <span class="hljs-keyword">this</span> <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> keys
+        <span class="hljs-keyword">else</span>
+          finish()                                      <span class="hljs-comment">#-&gt;finish 1</span>
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.currentView? <span class="hljs-keyword">and</span> <span class="hljs-property">@_$_p</span>.currentView <span class="hljs-keyword">isnt</span> <span class="hljs-keyword">this</span>
+          <span class="hljs-property">@_$_p</span>.currentView.closeCurrent finish, parent  <span class="hljs-comment">#-&gt;finish 2</span>
+        <span class="hljs-keyword">else</span>
+          finish()                                      <span class="hljs-comment">#-&gt;finish 2</span>
+
+        parent.closeViewAnimation <span class="hljs-keyword">this</span>,<span class="hljs-function"> =&gt;</span>
+          <span class="hljs-property">@trigger</span> <span class="hljs-string">"onClose"</span>
+          <span class="hljs-property">@onClose</span>?()
+          finish()                                      <span class="hljs-comment">#-&gt;finish 3</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>@lang=en Close view</p>
+<p>@lang=ru Закрытие view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">close</span>:<span class="hljs-function"><span class="hljs-params">(_view, callback)</span>-&gt;</span>
+        <span class="hljs-keyword">unless</span> _view?
+          callback? _view
+          <span class="hljs-keyword">return</span>
+        finish = _.after <span class="hljs-number">2</span>,<span class="hljs-function"> =&gt;</span> callback? _view              <span class="hljs-comment">#--finish 3 times</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@_$_p</span>.currentView? <span class="hljs-keyword">and</span> <span class="hljs-property">@_$_p</span>.currentView <span class="hljs-keyword">isnt</span> _view
+          <span class="hljs-property">@close</span> <span class="hljs-property">@_$_p</span>.currentView, finish
+        <span class="hljs-keyword">else</span>
+          finish()
+
+        <span class="hljs-property">@_setCurrentView</span> <span class="hljs-literal">null</span>
+        _view.closeCurrent finish, <span class="hljs-keyword">this</span>
+        _view</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Alias showViewAnimation(this)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">showAnimation</span>:<span class="hljs-function"><span class="hljs-params">(callback)</span>-&gt;</span>
+        <span class="hljs-property">@showViewAnimation</span> <span class="hljs-keyword">this</span>, callback</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Alias closeViewAnimation(this)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">closeAnimation</span>:<span class="hljs-function"><span class="hljs-params">(callback)</span>-&gt;</span>
+        <span class="hljs-property">@closeViewAnimation</span> <span class="hljs-keyword">this</span>, callback</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Helper method which can descride animation/behavior for <code>view</code> while base view <code>show</code> <code>view</code>. By default using <code>view.$el.show()</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">showViewAnimation</span>:<span class="hljs-function"><span class="hljs-params">(view, callback)</span>-&gt;</span>
+        <span class="hljs-keyword">unless</span> view?
+          callback? view
+          <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">if</span> view.showAnimation? <span class="hljs-keyword">and</span> view <span class="hljs-keyword">isnt</span> <span class="hljs-keyword">this</span>
+          view.showAnimation callback
+        <span class="hljs-keyword">else</span>
+          view.$el.show()
+          callback? view</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Helper method which can descride animation/behavior for <code>view</code> while base view <code>close</code> <code>view</code>. By default using <code>view.$el.show()</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">closeViewAnimation</span>:<span class="hljs-function"><span class="hljs-params">(view, callback)</span>-&gt;</span>
+        <span class="hljs-keyword">unless</span> view?
+          callback? view
+          <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">if</span> view.closeAnimation? <span class="hljs-keyword">and</span> view <span class="hljs-keyword">isnt</span> <span class="hljs-keyword">this</span>
+          view.closeAnimation callback
+        <span class="hljs-keyword">else</span>
+          view.$el.hide()
+          callback? view</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Depedencies Injection functionality
+<code>options</code> - options for <code>new View(options)</code>  operations
+<code>ViewParams</code></p>
+<ul>
+<li>type <code>Backbone.View</code> - if you use this View only once in ypu application</li>
+<li>type <code>instance Backbone.View</code> - if you save instance ny ViewParams.cid</li>
+<li>type <code>object</code> - usefull for multiple using Views<ul>
+<li>type: <code>Backbone.View</code> - View prototype</li>
+<li>key: <code>String</code> - key for different instace</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">getViewDI</span>:<span class="hljs-function"><span class="hljs-params">(ViewClass, options = {})</span>-&gt;</span>
+        <span class="hljs-keyword">if</span> ViewClass.cid?
+          TypeView = ViewClass.constructor
+          key = ViewClass.cid
+          <span class="hljs-property">@_$_p</span>.diViews[key] = ViewClass
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span>(ViewClass) <span class="hljs-keyword">is</span> <span class="hljs-string">"function"</span>
+          TypeView = ViewClass
+          key = TypeView._$_di <span class="hljs-keyword">or</span> (TypeView._$_di = _.uniqueId(<span class="hljs-string">"_$_di"</span>))
+        <span class="hljs-keyword">else</span>
+          TypeView = ViewClass.type
+          TypeView._$_di <span class="hljs-keyword">or</span> (TypeView._$_di = _.uniqueId(<span class="hljs-string">"_$_di"</span>))
+          key =  ViewClass.key
+        diview = <span class="hljs-property">@_$_p</span>.diViews[key]
+        removeFlag = !!diview?._$_p?.removeFlag
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> diview? <span class="hljs-keyword">or</span> removeFlag
+          <span class="hljs-property">@_$_p</span>.diViews[key] = view = <span class="hljs-keyword">new</span> TypeView options
+          <span class="hljs-keyword">unless</span> view._$_p?
+            view._$_p =  {<span class="hljs-attribute">removeFlag</span>: <span class="hljs-literal">false</span>}
+            remove = view.remove
+            view.r<span class="hljs-function"><span class="hljs-title">emove</span> = -&gt;</span>
+              remove.apply view, arguments
+              view._$_p.removeFlag = <span class="hljs-literal">true</span>
+        <span class="hljs-property">@_$_p</span>.diViews[key]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>@lang=en Reload html template in root dom-element</p>
+<p>@lang=ru Перезаливка html шаблона в корневой dom элемент</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">reloadTemplate</span>:<span class="hljs-function">-&gt;</span>
+        template = <span class="hljs-literal">null</span>
+        data = <span class="hljs-literal">null</span>
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@template</span>?
+          $el = $(<span class="hljs-property">@template</span>)
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> !!$el.length
+          template = $el.html()
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@templateData</span>?
+          data = _.result(<span class="hljs-keyword">this</span>,<span class="hljs-string">"templateData"</span>)
+          <span class="hljs-property">@templateFunc</span>? <span class="hljs-keyword">or</span> <span class="hljs-property">@templateFunc</span> = _.template
+
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@templateFunc</span>?
+          <span class="hljs-property">@$el</span>.html <span class="hljs-property">@templateFunc</span>(template, data)
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> template?
+          <span class="hljs-property">@$el</span>.html template</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>@lang=en unbingind regions for current view</p>
+<p>@lang=ru деинициализация регионов для текущей view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">unbindRegions</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@regions</span>
+        <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> <span class="hljs-property">@regions</span>
+          <span class="hljs-keyword">continue</span> <span class="hljs-keyword">if</span> k <span class="hljs-keyword">is</span> <span class="hljs-string">"__oldmode__"</span>
+          <span class="hljs-keyword">this</span>.r[k].remove()
+          <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.r[k]
+          <span class="hljs-keyword">if</span> <span class="hljs-property">@regions</span>.__oldmode__
+            <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>[k]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>@lang=en binding regions for current view</p>
+<p>@lang=ru инициализация регионов для текущей view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">bindRegions</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@r</span> ?= {}
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@regions</span>
+        rx = <span class="hljs-regexp">/@ui\.([^ ]+)/</span>
+        isOldMode = _.isBoolean(<span class="hljs-property">@regions</span>.__oldmode__) <span class="hljs-keyword">and</span> <span class="hljs-property">@regions</span>.__oldmode__
+        <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> <span class="hljs-property">@regions</span>
+          <span class="hljs-keyword">continue</span> <span class="hljs-keyword">if</span> k <span class="hljs-keyword">is</span> <span class="hljs-string">"__oldmode__"</span>
+          <span class="hljs-keyword">if</span> _.isObject(v)
+            el = <span class="hljs-keyword">if</span> _.isString(v.el)
+              <span class="hljs-property">@$el</span>.find(v.el)
+            <span class="hljs-keyword">else</span>
+              el = v.el
+            View = v.view
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">if</span> rx.exec(v)? <span class="hljs-keyword">and</span> <span class="hljs-property">@ui</span>[RegExp.$<span class="hljs-number">1</span>]?
+              el = <span class="hljs-property">@ui</span>[RegExp.$<span class="hljs-number">1</span>]
+            <span class="hljs-keyword">else</span>
+              el = <span class="hljs-property">@$el</span>.find(v)
+            View = MixinBackbone(Backbone.View)
+
+          <span class="hljs-keyword">if</span> <span class="hljs-keyword">this</span>.r[k]?
+            <span class="hljs-keyword">this</span>.r[k].setElement el
+          <span class="hljs-keyword">else</span>
+            options = {el}
+            <span class="hljs-keyword">if</span> _.isFunction(v.scope)
+              opt = v.scope.call <span class="hljs-keyword">this</span>
+              _.extend options, opt
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> _.isObject(v.scope)
+              _.extend options, v.scope
+            <span class="hljs-keyword">this</span>.r[k] = <span class="hljs-keyword">new</span> View options
+          <span class="hljs-keyword">this</span>[k] = <span class="hljs-keyword">this</span>.r[k] <span class="hljs-keyword">if</span> isOldMode <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">this</span>[k]?</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>@lang=en binding ui elements for current view</p>
+<p>@lang=ru инициализация ui элементов для текущей view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">bindUIElements</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@ui</span>?
+        <span class="hljs-property">@unbindUIElements</span>()
+        <span class="hljs-property">@_$_p</span>.varbindUIElements = _.extend {}, <span class="hljs-property">@ui</span>
+        <span class="hljs-property">@ui</span> = {}
+        <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">of</span> <span class="hljs-property">@_$_p</span>.varbindUIElements
+          <span class="hljs-property">@ui</span>[k] = <span class="hljs-property">@$el</span>.find v</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>@lang=en unbinding ui elements for current view</p>
+<p>@lang=ru деинициализация ui элементов для текущей view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">unbindUIElements</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_$_p</span>.varbindUIElements?
+        <span class="hljs-property">@ui</span> = <span class="hljs-property">@_$_p</span>.varbindUIElements
+        <span class="hljs-property">@_$_p</span>.varbindUIElements = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>@lang=en binding ui elements for current view with epoxy support</p>
+<p>@lang=ru инициализация ui элементов для текущей view с поддержкой epoxy</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">bindUIEpoxy</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@bindings</span>
+        <span class="hljs-property">@unbindUIEpoxy</span>()
+        <span class="hljs-property">@_$_p</span>.var_bindings = <span class="hljs-property">@bindings</span>
+        rx = <span class="hljs-regexp">/@ui\.([^ ]+)/</span>
+        <span class="hljs-property">@bindings</span> = _.reduce <span class="hljs-property">@_$_p</span>.var_bindings, <span class="hljs-function">(<span class="hljs-params">(memo, v,k)</span>=&gt;</span>
+          <span class="hljs-keyword">if</span> rx.exec(k)?
+            selector = <span class="hljs-property">@_$_p</span>.varbindUIElements[RegExp.$<span class="hljs-number">1</span>]
+            key = k.replace rx, selector
+            memo[key] = v
+          <span class="hljs-keyword">else</span>
+            memo[k] = v
+          memo
+        ),{}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>@lang=en binding ui elements for current view with epoxy support</p>
+<p>@lang=ru инициализация ui элементов для текущей view c поддержкой epoxy</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">unbindUIEpoxy</span>:<span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> <span class="hljs-property">@_$_p</span>.var_bindings?
+        <span class="hljs-property">@bindings</span> = <span class="hljs-property">@_$_p</span>.var_bindings
+        <span class="hljs-property">@_$_p</span>.var_bindings = <span class="hljs-literal">null</span>
+
+  MixinBackbone</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>AMD support</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>) <span class="hljs-keyword">and</span> (<span class="hljs-keyword">typeof</span> define.amd <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>) <span class="hljs-keyword">and</span> define.amd
+  define [<span class="hljs-string">"backbone"</span>], <span class="hljs-function"><span class="hljs-params">(Backbone)</span>-&gt;</span> MixinBackbone(Backbone)
+<span class="hljs-keyword">else</span>
+  <span class="hljs-built_in">window</span>.MixinBackbone = MixinBackbone(Backbone)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
