@@ -3,7 +3,7 @@ MixinBackbone = (Backbone)->
   MixinBackbone = (BaseClass)->
     BaseClass.extend
       constructor:(options)->
-        @_$_options = options        
+        @_$_options = options
         BaseClass::constructor?.apply this, arguments
         delete @_$_options
 
@@ -69,7 +69,7 @@ MixinBackbone = (Backbone)->
           name = RegExp.$1
         else
           name = _name
-        @listenTo obj, "change:#{name}", callback        
+        @listenTo obj, "change:#{name}", callback
         setTimeout (=>
           callback.call this, obj, obj.get(name),{}
         ), 0
@@ -350,9 +350,9 @@ MixinBackbone = (Backbone)->
               el = @$el.find(v)
             View = MixinBackbone(Backbone.View)
 
-          if this.r[k]? 
+          if this.r[k]?
             this.r[k].setElement el
-          else 
+          else
             options = {el}
             if _.isFunction(v.scope)
               opt = v.scope.call this
