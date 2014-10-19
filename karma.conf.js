@@ -41,10 +41,15 @@ module.exports = function(config) {
       'test/*.coffee': ['coffee']
     },
     coverageReporter:{
-      type : 'lcovonly',
-      dir : 'coverage',
-      subdir: '.',
-      file : 'lcov.info'
+      reporters: [{
+        type : 'lcovonly',
+        dir : 'coverage',
+        subdir: '.',
+        file : 'lcov.info'
+      },{
+        type: 'html',
+        dir:'coverage/'
+      }]
     },
 
 
