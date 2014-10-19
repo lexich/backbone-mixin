@@ -308,7 +308,8 @@ MixinBackbone = (Backbone)->
 
         if @templateData?
           data = _.result(this,"templateData")
-          @templateFunc? or @templateFunc = _.template
+          unless @templateFunc?
+            @templateFunc = _.template
 
         if @templateFunc?
           @$el.html @templateFunc(template, data)

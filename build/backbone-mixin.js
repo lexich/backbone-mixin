@@ -326,7 +326,9 @@ MixinBackbone = function(Backbone) {
         }
         if (this.templateData != null) {
           data = _.result(this, "templateData");
-          (this.templateFunc != null) || (this.templateFunc = _.template);
+          if (this.templateFunc == null) {
+            this.templateFunc = _.template;
+          }
         }
         if (this.templateFunc != null) {
           return this.$el.html(this.templateFunc(template, data));

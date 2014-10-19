@@ -31,7 +31,21 @@ module.exports = function(config) {
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
+
+    preprocessors: {
+      // source files, that you wanna generate coverage for
+      // do not include tests or libraries
+      // (these files will be instrumented by Istanbul)
+      'dist/*.coffee': ['coverage'],
+      'test/*.coffee': ['coffee']
+    },
+    coverageReporter:{
+      type : 'lcovonly',
+      dir : 'coverage',
+      subdir: '.',
+      file : 'lcov.info'
+    },
 
 
     // web server port
