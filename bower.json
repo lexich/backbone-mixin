@@ -1,6 +1,6 @@
 {
   "name": "backbone-mixin",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "authors": [
     "lexich121@gmail.com"
   ],
@@ -25,5 +25,8 @@
     "Epoxy",
     "mixin"
   ],
-  "private": false
+  "private": false,
+  "devDependencies": {
+    "backbone.epoxy": "~1.3.1"
+  }
 }

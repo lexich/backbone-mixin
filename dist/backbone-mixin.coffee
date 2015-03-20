@@ -392,6 +392,7 @@ MixinBackbone = (Backbone)->
       #
       bindUIEpoxy:->
         return unless @bindings
+        return if @bindings is "data-bind"
         @unbindUIEpoxy()
         @_$_p.var_bindings = @bindings
         rx = /@ui\.([^ ]+)/

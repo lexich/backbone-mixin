@@ -436,6 +436,9 @@ MixinBackbone = function(Backbone) {
         if (!this.bindings) {
           return;
         }
+        if (this.bindings === "data-bind") {
+          return;
+        }
         this.unbindUIEpoxy();
         this._$_p.var_bindings = this.bindings;
         rx = /@ui\.([^ ]+)/;
